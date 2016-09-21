@@ -10,8 +10,12 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,
@@ -21,6 +25,8 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
  */
 public class TypeChef {
 
+    private static final Parser<Formula> PC_PARSER = new Parser<>(new TypeChefPresenceConditionGrammar());
+    
     private File exe;
     
     private File linuxDir;
@@ -248,7 +254,16 @@ public class TypeChef {
                 currentLocation = Files.relativize(new File(currentLocation), linuxDir);
                 
             } else if (line.startsWith("#if")) {
-                Block newBlock = new Block(line.substring(4), currentLocation, lineNumber);
+                String pcStr = line.substring(4);
+                
+                Formula pc = new True();
+                try {
+                    pc = PC_PARSER.parse(pcStr);
+                } catch (ExpressionFormatException e) {
+                    Logger.INSTANCE.logException("Can't parse presence condition " + pcStr, e);
+                }
+                
+                Block newBlock = new Block(pc, currentLocation, lineNumber);
                 if (currentBlock != null) {
                     currentBlock.setNext(newBlock);
                 }
@@ -258,13 +273,13 @@ public class TypeChef {
                 }
                 
             } else if (line.startsWith("#endif")) {
-                Block newBlock = new Block("", currentLocation, lineNumber);
+                Block newBlock = new Block(new True(), currentLocation, lineNumber);
                 currentBlock.setNext(newBlock);
                 currentBlock = newBlock;
                 
             } else {
                 if (currentBlock == null) {
-                    currentBlock = new Block("", currentLocation, lineNumber);
+                    currentBlock = new Block(new True(), currentLocation, lineNumber);
                 }
                 if (sourceFile.getFirstBlock() == null) {
                     sourceFile.setFirstBlock(currentBlock);
@@ -330,7 +345,7 @@ public class TypeChef {
             
             try {
                 BufferedWriter writer = new BufferedWriter(new FileWriter(pc));
-                writer.write(file.getPresenceCondition().toString()); // TODO
+                writer.write(file.getPresenceCondition().toString()); // TODO: format
                 writer.newLine();
                 writer.close();
                 

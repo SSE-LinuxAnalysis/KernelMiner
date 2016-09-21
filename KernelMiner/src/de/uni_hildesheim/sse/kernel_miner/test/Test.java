@@ -15,6 +15,7 @@ import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
 public class Test {
 
@@ -95,12 +96,12 @@ public class Test {
     private static void writeCsv(SourceFile file, File dir) throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, "structure.csv")));
         for (Block currentBlock = file.getFirstBlock(); currentBlock != null; currentBlock = currentBlock.getNext()) {
-            if (currentBlock.containsCode() && !currentBlock.getPresenceCondition().equals("")) {
+            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition() instanceof True)) {
                 writer.write(
                         file.getPath().getPath() + ";"
                         + currentBlock.getPiLineNumber() + ";"
                         + currentBlock.getLocation() + ";"
-                        + currentBlock.getPresenceCondition()
+                        + currentBlock.getPresenceCondition() // TODO: format
                         + "\n"
                 );
             }

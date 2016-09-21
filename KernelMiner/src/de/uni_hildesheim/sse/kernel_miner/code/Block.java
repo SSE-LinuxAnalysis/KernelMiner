@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+
 /**
  * Represents a single #ifdef block inside a {@link SourceFile}.
  * 
@@ -11,7 +13,7 @@ import java.util.List;
  */
 public class Block {
     
-    private String presenceCondition;
+    private Formula presenceCondition;
     
     private Block next;
     
@@ -28,7 +30,7 @@ public class Block {
      * @param location The file this block originates from (e.g. which included header it comes from).
      * @param piLineNumber The line number in the .pi file in the TypeChef output this block was read from.
      */
-    public Block(String presenceCondition, String location, int piLineNumber) {
+    public Block(Formula presenceCondition, String location, int piLineNumber) {
         this.presenceCondition = presenceCondition;
         this.location = location;
         this.piLineNumber = piLineNumber;
@@ -52,7 +54,7 @@ public class Block {
     /**
      * @return The presence condition of this block.
      */
-    public String getPresenceCondition() {
+    public Formula getPresenceCondition() {
         return presenceCondition;
     }
     
