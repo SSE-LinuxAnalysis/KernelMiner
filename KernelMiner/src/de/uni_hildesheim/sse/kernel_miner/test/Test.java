@@ -13,6 +13,7 @@ import de.uni_hildesheim.sse.kernel_miner.code.Block;
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
 import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
+import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 
 public class Test {
@@ -74,7 +75,7 @@ public class Test {
         command.add("-czf");
         command.add(dir.getAbsolutePath() + ".tar.gz");
         for (File f : dir.listFiles()) {
-            command.add(TypeChef.relativize(f, new File(dir.getAbsolutePath()).getParentFile()));
+            command.add(Files.relativize(f, new File(dir.getAbsolutePath()).getParentFile()));
         }
         
         ProcessBuilder bldr = new ProcessBuilder(command);
@@ -114,7 +115,7 @@ public class Test {
         File dir = new File(file.getPath().getPath().replace('/', '.'));
         
         try {
-            TypeChef chef = new TypeChef(new File(BASE_DIR, "linux-releases/linux-4.4"), "x86",
+            TypeChef chef = new TypeChef(new File(BASE_DIR, "linux-releases/linux-4.4"),
                     new File(BASE_DIR, "kconfig_models/linux-4.4"));
     
             chef.runOnFile(file);
