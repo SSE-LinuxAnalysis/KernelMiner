@@ -5,27 +5,56 @@ import java.util.List;
 
 import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 
+/**
+ * Parsers strings based on {@link Grammar}s.
+ * 
+ * @author Adam Krafczyk
+ */
 public class Parser<T> {
     
     private Grammar<T> grammar;
     
+    /**
+     * Creates a new parser for the given {@link Grammar}.
+     * 
+     * @param grammar The {@link Grammar} that describes the format to parse.
+     */
     public Parser(Grammar<T> grammar) {
         this.grammar = grammar;
     }
     
+    /**
+     * Parses the given string based on the {@link Grammar} this parser was
+     * created for.
+     * 
+     * @param expression The expression to parse.
+     * @return The parsed expression, as created by the make* methods in the given {@link Grammar}.
+     * 
+     * @throws ExpressionFormatException If the supplied string is not a valid expression for the given {@link Grammar}.
+     */
     public T parse(String expression) throws ExpressionFormatException  {
         return parse(lex(expression));
     }
 
+    /**
+     * Lexes the given expression, based on the {@link Grammar} this parser was created for.
+     * 
+     * @param expression The expression to lex.
+     * @return A flat list of {@link Element} that represent the tokens in the expression.
+     * 
+     * @throws ExpressionFormatException If the expression contains characters not allowed by the {@link Grammar}.
+     */
     private List<Element> lex(String expression) throws ExpressionFormatException {
         List<Element> result = new LinkedList<>();
         
         Identifier currentIdentifier = null;
         
+        // iterate over the string; i is incremented based on which element was identified
         for (int i = 0; i < expression.length();) {
             String op = grammar.getOperator(expression, i);
             
             if (grammar.isWhitespaceChar(expression, i)) {
+                // whitespaces are ignored
                 i++;
                 
             } else  if (grammar.isOpeningBracketChar(expression, i)) {
@@ -60,11 +89,24 @@ public class Parser<T> {
         return result;
     }
     
+    /**
+     * Parses the flat list of elements that the lexer found, based on the {@link Grammar}
+     * this parser was created for.
+     * 
+     * @param elements The flat list of elements; the output of {@link #lex(String)}.
+     * @return The parsed expression.
+     * 
+     * @throws ExpressionFormatException If the expression denoted by elements is malformed.
+     */
     private T parse(List<Element> elements) throws ExpressionFormatException {
+        // this method calls itself recursively
+
+        // if we have  no elements left then something went wrong
         if (elements.size() == 0) {
             throw new ExpressionFormatException("Expected identifier");
         }
         
+        // if we only have one element left, then it must be an identifier
         if (elements.size() == 1) {
             if (!(elements.get(0) instanceof Identifier)) {
                 throw new ExpressionFormatException("Expected identifier, got " + elements.get(0));
@@ -73,7 +115,9 @@ public class Parser<T> {
             return grammar.makeIdentifierFormula(((Identifier) elements.get(0)).name.toString());
         }
         
-        int highestOperandLevel = -1;
+        // find the "highest" operator in the bracket tree
+        
+        int highestOperatorLevel = -1;
         int highestOpPos = -1;
         String highestOp = null;
         
@@ -94,13 +138,21 @@ public class Parser<T> {
                 
             } else if (e instanceof Operator) {
                 Operator op = (Operator) e;
+                
+                // if ...
                 if (
-                        highestOperandLevel == -1
-                        || bracketDepth < highestOperandLevel
-                        || (highestOperandLevel == bracketDepth && !highestOp.equals(op.op) && grammar.hasHigherPrecendece(op.op, highestOp))) {
+                        highestOperatorLevel == -1 // .. we haven't found any operator yet
+                        || bracketDepth < highestOperatorLevel // ... the current operator is "higher" in the bracket structure
+                        || (
+                                highestOperatorLevel == bracketDepth
+                                && !highestOp.equals(op.op)
+                                && grammar.hasHigherPrecendece(op.op, highestOp)
+                        ) // ... the current operator has the same level as the previously found one, but
+                          // it has a higher precedence
+                ) {
                     highestOpPos = i;
                     highestOp = op.op;
-                    highestOperandLevel = bracketDepth;
+                    highestOperatorLevel = bracketDepth;
                 }
             }
         }
@@ -110,8 +162,12 @@ public class Parser<T> {
         }
         
         T result = null;
-        
-        if (highestOperandLevel == 0) {
+
+        // if there is an operator that is not nested in any brackets
+        if (highestOperatorLevel == 0) {
+            // recursively parse the nested parts based on whether the operator is binary or not
+            // and pass the results to the grammer to create the result
+            
             if (grammar.isBinary(highestOp)) {
                 List<Element> leftElements = new LinkedList<>();
                 List<Element> rightElements = new LinkedList<>();
@@ -141,6 +197,8 @@ public class Parser<T> {
                 
             }
         } else {
+            // unpack the brackets and recursively call parse()
+            
             if (!(elements.get(0) instanceof Bracket) || !(elements.get(elements.size() - 1) instanceof Bracket)) {
                 throw new ExpressionFormatException("Couldn't find operator");
             }
@@ -163,7 +221,15 @@ public class Parser<T> {
         return result;
     }
     
-    private static class Element {
+    /**
+     * A token identified by the lexer. One of the three child classes:
+     * <ul>
+     *      <li>{@link Bracket}</li>
+     *      <li>{@link Operator}</li>
+     *      <li>{@link Identifier}</li>
+     * </ul>
+     */
+    private abstract static class Element {
     }
     
     private static final class Operator extends Element {

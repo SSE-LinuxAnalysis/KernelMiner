@@ -9,7 +9,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
 
 /**
- * A simple {@link Grammar} for C-style boolean expressions.
+ * A {@link Grammar} for C-style boolean expressions.
  * 
  * <p>
  * Examples:
@@ -22,7 +22,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
  * 
  * @author Adam Krafczyk
  */
-public class SimpleCStyleBooleanGrammar extends Grammar<Formula> {
+public class CStyleBooleanGrammar extends Grammar<Formula> {
 
     @Override
     public String getOperator(String str, int i) {

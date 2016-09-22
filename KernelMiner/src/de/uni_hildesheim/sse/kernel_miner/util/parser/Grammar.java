@@ -13,7 +13,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
  * two expressions they are applied to.
  * </p>
  * 
- * @see SimpleCStyleBooleanGrammar
+ * @see CStyleBooleanGrammar
  * 
  * @author Adam Krafczyk
  */
