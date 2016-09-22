@@ -28,6 +28,7 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
             return false;
         }
         
+        // check that this is not the bracket of a definedEx()
         if (i >= "definedEx".length()) {
             String part = str.substring(i - "definedEx".length(), i);
             if (part.equals("definedEx")) {
@@ -44,6 +45,7 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
             return false;
         }
         
+        // check that this is not the bracket of a definedEx()
         int j = i - 1;
         while (j > 0 && str.substring(j, j + 1).matches("[a-zA-Z0-9_]")) {
             j--;
