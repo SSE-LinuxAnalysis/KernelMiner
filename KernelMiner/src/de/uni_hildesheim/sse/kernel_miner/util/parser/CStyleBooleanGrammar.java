@@ -68,7 +68,7 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
 
     @Override
     public boolean isBinary(String operator) {
-        return !operator.equals("!");
+        return operator.equals("&&") || operator.equals("||");
     }
 
     @Override
