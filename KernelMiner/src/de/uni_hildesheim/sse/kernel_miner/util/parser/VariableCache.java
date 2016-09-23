@@ -26,4 +26,8 @@ public class VariableCache {
         variables.clear();
     }
     
+    public int getNumVariables() {
+        return variables.size();
+    }
+    
 }

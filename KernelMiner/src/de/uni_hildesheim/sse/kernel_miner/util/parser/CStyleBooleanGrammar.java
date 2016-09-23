@@ -26,9 +26,6 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
 
     private VariableCache cache;
     
-    public CStyleBooleanGrammar() {
-    }
-    
     public CStyleBooleanGrammar(VariableCache cache) {
         this.cache = cache;
     }

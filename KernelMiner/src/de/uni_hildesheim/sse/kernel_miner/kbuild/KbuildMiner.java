@@ -12,6 +12,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
 public class KbuildMiner {
     
@@ -20,7 +21,8 @@ public class KbuildMiner {
         
         BufferedReader in = new BufferedReader(new FileReader(pcFile));
         
-        Parser<Formula> pcParser = new Parser<Formula>(new KbuildMinerPcGrammar());
+        VariableCache cache = new VariableCache();
+        Parser<Formula> pcParser = new Parser<Formula>(new KbuildMinerPcGrammar(cache));
         
         String line;
         while ((line = in.readLine()) != null) {

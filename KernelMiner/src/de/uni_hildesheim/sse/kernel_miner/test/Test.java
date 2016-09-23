@@ -14,6 +14,7 @@ import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
 public class Test {
 
@@ -97,11 +98,11 @@ public class Test {
         StringBuffer content = new StringBuffer();
         
         for (Block currentBlock = file.getFirstBlock(); currentBlock != null; currentBlock = currentBlock.getNext()) {
-            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition().equals(""))) {
+            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition() instanceof True)) {
                 content.append(file.getPath().getPath()).append(";")
                         .append(currentBlock.getPiLineNumber()).append(";")
                         .append(currentBlock.getLocation()).append(";")
-                        .append(currentBlock.getPresenceCondition())
+                        .append(currentBlock.getPresenceCondition().toString()) // TODO: format
                         .append("\n");
             }
         }
