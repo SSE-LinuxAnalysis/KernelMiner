@@ -14,7 +14,7 @@ public class Files {
         return base.toURI().relativize(path.toURI()).getPath();
     }
     
-    public static String readFile(InputStream in, Charset charset) throws IOException {
+    public static String readStream(InputStream in, Charset charset) throws IOException {
         StringBuffer content = new StringBuffer();
         byte[] buf = new byte[512];
         int read = 0;
@@ -30,7 +30,7 @@ public class Files {
     }
     
     public static String readFile(InputStream in) throws IOException {
-        return readFile(in, Charset.forName("UTF-8"));
+        return readStream(in, Charset.forName("UTF-8"));
     }
     
     public static String readFile(File file, Charset charset) throws FileNotFoundException, IOException {
@@ -38,7 +38,7 @@ public class Files {
         FileInputStream in = null;
         try {
             in = new FileInputStream(file);
-            content = readFile(in, charset);
+            content = readStream(in, charset);
         } finally {
             try {
                 if (in != null) {

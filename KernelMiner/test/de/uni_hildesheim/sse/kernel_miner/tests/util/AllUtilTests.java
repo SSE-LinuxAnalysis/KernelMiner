@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.tests;
+package de.uni_hildesheim.sse.kernel_miner.tests.util;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
@@ -7,7 +7,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.uni_hildesheim.sse.kernel_miner.tests.util.parser.ParserTest;
 
 @RunWith(Suite.class)
-@SuiteClasses({ParserTest.class})
-public class AllTests {
+@SuiteClasses({ FilesTest.class, ParserTest.class })
+public class AllUtilTests {
 
 }
