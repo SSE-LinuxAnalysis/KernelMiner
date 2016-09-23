@@ -1,11 +1,15 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
-public class Negation extends Formula {
+public final class Negation extends Formula {
     
     private Formula formula;
     
     public Negation(Formula formula) {
         this.formula = formula;
+    }
+    
+    public Formula getFormula() {
+        return formula;
     }
 
     @Override

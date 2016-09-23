@@ -1,6 +1,6 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
-public class Conjunction extends Formula {
+public final class Conjunction extends Formula {
 
     private Formula left;
     
@@ -9,6 +9,14 @@ public class Conjunction extends Formula {
     public Conjunction(Formula left, Formula right) {
         this.left = left;
         this.right = right;
+    }
+    
+    public Formula getLeft() {
+        return left;
+    }
+    
+    public Formula getRight() {
+        return right;
     }
     
     @Override

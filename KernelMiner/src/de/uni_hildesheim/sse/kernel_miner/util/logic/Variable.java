@@ -1,6 +1,6 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
-public class Variable extends Formula {
+public final class Variable extends Formula {
     
     private String name;
     

@@ -1,9 +1,7 @@
 package de.uni_hildesheim.sse.kernel_miner.test;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +13,7 @@ import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
+import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 
 public class Test {
 
@@ -35,7 +33,9 @@ public class Test {
             System.exit(-1);
         }
         
+        // for debugging purposes, only selected files can be parsed by the following lines:
 //        files.clear();
+//        files.add(new SourceFile(new File("kernel/kallsyms.c")));
 //        files.add(new SourceFile(new File("arch/x86/kernel/crash.c")));
 //        files.add(new SourceFile(new File("arch/x86/kernel/fpu/regset.c")));
         
@@ -49,7 +49,7 @@ public class Test {
             e.printStackTrace();
             System.exit(-1);
         }
-
+        
         readFileNames();
         
         Logger.INSTANCE.logInfo("Starting " + NUM_THREADS + " worker threads");
@@ -93,20 +93,21 @@ public class Test {
         }
     }
     
-    private static void writeCsv(SourceFile file, File dir) throws IOException {
-        BufferedWriter writer = new BufferedWriter(new FileWriter(new File(dir, "structure.csv")));
+    private static void writeCsv(SourceFile file, ZipArchive output) throws IOException {
+        StringBuffer content = new StringBuffer();
+        
         for (Block currentBlock = file.getFirstBlock(); currentBlock != null; currentBlock = currentBlock.getNext()) {
-            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition() instanceof True)) {
-                writer.write(
-                        file.getPath().getPath() + ";"
-                        + currentBlock.getPiLineNumber() + ";"
-                        + currentBlock.getLocation() + ";"
-                        + currentBlock.getPresenceCondition() // TODO: format
-                        + "\n"
-                );
+            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition().equals(""))) {
+                content.append(file.getPath().getPath()).append(";")
+                        .append(currentBlock.getPiLineNumber()).append(";")
+                        .append(currentBlock.getLocation()).append(";")
+                        .append(currentBlock.getPresenceCondition())
+                        .append("\n");
             }
         }
-        writer.close();
+        
+        File filename = new File(file.getPath().getPath() + ".csv");
+        output.writeFile(filename, content.toString());
     }
     
     private static final File BASE_DIR = new File("/home/adam/typechef_tests");
@@ -123,7 +124,7 @@ public class Test {
             
             
             if (file.getFirstBlock() != null) {
-                writeCsv(file, dir);
+                writeCsv(file, chef.getOutput());
                 Logger.INSTANCE.logInfo("Finished file " + file.getPath(),
                         files.size() + " files left");
                 
@@ -133,7 +134,7 @@ public class Test {
             
             
         } catch (IllegalArgumentException | IOException e) {
-            Logger.INSTANCE.logException("Caught exception for file" + file.getPath(), e);
+            Logger.INSTANCE.logException("Caught exception for file " + file.getPath(), e);
         }
         
         if (dir.isDirectory()) {

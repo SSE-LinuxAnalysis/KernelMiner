@@ -26,7 +26,7 @@ public abstract class Grammar<T> {
      * @param i The pointer to the location in <code>str</null> where the operator may be.
      * @return The operator as a string (e.g. "&&") if a valid operator; <code>null</code> otherwise.
      */
-    public abstract String getOperator(String str, int i);
+    public abstract String getOperator(char[] str, int i);
     
     /**
      * Checks whether <code>i</code> points to a whitespace character in the string <code>str</code>.
@@ -36,7 +36,7 @@ public abstract class Grammar<T> {
      * @param i The pointer to the location in <code>str</code> of the possible whitespace character.
      * @return <code>true</code>, if <code>str.charAt(i)</code> is a whitespace character; <code>false</code> otherwise.
      */
-    public abstract boolean isWhitespaceChar(String str, int i);
+    public abstract boolean isWhitespaceChar(char[] str, int i);
     
     /**
      * Checks whether <code>i</code> points to an opening bracket in the string <code>str</code>.
@@ -45,7 +45,7 @@ public abstract class Grammar<T> {
      * @param i The pointer to the location in <code>str</code> of the possible opening bracket.
      * @return <code>true</code>, if <code>str.charAt(i)</code> is an opening bracket; <code>false</code> otherwise.
      */
-    public abstract boolean isOpeningBracketChar(String str, int i);
+    public abstract boolean isOpeningBracketChar(char[] str, int i);
     
     /**
      * Checks whether <code>i</code> points to a closing bracket in the string <code>str</code>.
@@ -54,7 +54,7 @@ public abstract class Grammar<T> {
      * @param i The pointer to the location in <code>str</code> of the possible closing bracket.
      * @return <code>true</code>, if <code>str.charAt(i)</code> is a closing bracket; <code>false</code> otherwise.
      */
-    public abstract boolean isClosingBracketChar(String str, int i);
+    public abstract boolean isClosingBracketChar(char[] str, int i);
     
     /**
      * Checks whether <code>i</code> points to an identifier character in the string <code>str</code>.
@@ -63,7 +63,7 @@ public abstract class Grammar<T> {
      * @param i The pointer to the location in <code>str</code> of the possible identifier character.
      * @return <code>true</code>, if <code>str.charAt(i)</code> is an identifier character; <code>false</code> otherwise.
      */
-    public abstract boolean isIdentifierChar(String str, int i);
+    public abstract boolean isIdentifierChar(char[] str, int i);
     
     /**
      * Checks whether the operator <code>toCheck</code> has a higher precedence than <code>comparedTo</code>.

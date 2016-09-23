@@ -24,17 +24,26 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
  */
 public class CStyleBooleanGrammar extends Grammar<Formula> {
 
+    private VariableCache cache;
+    
+    public CStyleBooleanGrammar() {
+    }
+    
+    public CStyleBooleanGrammar(VariableCache cache) {
+        this.cache = cache;
+    }
+    
     @Override
-    public String getOperator(String str, int i) {
-        if (str.charAt(i) == '!') {
+    public String getOperator(char[] str, int i) {
+        if (str[i] == '!') {
             return "!";
         }
         
-        if (str.substring(i).startsWith("&&")) {
+        if (str[i] == '&' && str[i + 1] == '&') {
             return "&&";
         }
         
-        if (str.substring(i).startsWith("||")) {
+        if (str[i] == '|' && str[i + 1] == '|') {
             return "||";
         }
         
@@ -42,23 +51,26 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
     }
 
     @Override
-    public boolean isWhitespaceChar(String str, int i) {
-        return str.charAt(i) == ' ';
+    public boolean isWhitespaceChar(char[] str, int i) {
+        return str[i] == ' ';
     }
 
     @Override
-    public boolean isOpeningBracketChar(String str, int i) {
-        return str.charAt(i) == '(';
+    public boolean isOpeningBracketChar(char[] str, int i) {
+        return str[i] == '(';
     }
 
     @Override
-    public boolean isClosingBracketChar(String str, int i) {
-        return str.charAt(i) == ')';
+    public boolean isClosingBracketChar(char[] str, int i) {
+        return str[i] == ')';
     }
 
     @Override
-    public boolean isIdentifierChar(String str, int i) {
-        return str.substring(i, i + 1).matches("[a-zA-Z0-9_]");
+    public boolean isIdentifierChar(char[] str, int i) {
+        return (str[i] >= 'a' && str[i] <= 'z')
+                || (str[i] >= 'A' && str[i] <= 'Z')
+                || (str[i] >= '0' && str[i] <= '9')
+                || (str[i] == '_');
     }
 
     @Override
@@ -87,6 +99,9 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
 
     @Override
     public Formula makeIdentifierFormula(String identifier) throws ExpressionFormatException {
+        if (this.cache != null) {
+            return this.cache.getVariable(identifier);
+        }
         return new Variable(identifier);
     }
 

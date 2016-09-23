@@ -3,19 +3,17 @@ package de.uni_hildesheim.sse.kernel_miner.code;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.StringReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
-import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
+import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,
@@ -25,7 +23,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
  */
 public class TypeChef {
 
-    private static final Parser<Formula> PC_PARSER = new Parser<>(new TypeChefPresenceConditionGrammar());
+//    private static final Parser<Formula> PC_PARSER = new Parser<>(new TypeChefPresenceConditionGrammar());
     
     private File exe;
     
@@ -42,6 +40,8 @@ public class TypeChef {
     private List<File> postIncludeDirs;
     
     private List<File> linuxIncludeDirs;
+    
+    private ZipArchive output;
     
     /**
      * Creates a {@link TypeChef} instance with default parameters (arch x86) that
@@ -65,6 +65,8 @@ public class TypeChef {
         
         linuxIncludeDirs = new ArrayList<>();
         addDefaultLinuxIncludeDirs();
+        
+        output = new ZipArchive(new File("typechef_output_" + linuxDir.getName() + ".zip"));
     }
     
     /**
@@ -188,6 +190,24 @@ public class TypeChef {
     }
     
     /**
+     * Sets the output destination. A zip file with the given name will be created.
+     * If the archive already exists, then the .pi files within will be reused and
+     * new ones will be added to the archive.
+     * 
+     * @param output The name of the zip file to store output in. Should end with ".zip".
+     */
+    public void setOutput(File output) {
+        this.output = new ZipArchive(output);
+    }
+    
+    /**
+     * @return The {@link ZipArchive} where the output is stored.
+     */
+    public ZipArchive getOutput() {
+        return output;
+    }
+    
+    /**
      * Checks whether all parameters are set to sane values.
      * 
      * @throws IllegalArgumentException If any of the parameters is not set correctly.
@@ -236,12 +256,19 @@ public class TypeChef {
      *      
      * @throws IOException If reading the .pi file fails.
      */
-    private void parseOutput(File piFile, SourceFile sourceFile) throws IOException {
-        BufferedReader in = new BufferedReader(new FileReader(piFile));
+    private void parseOutput(SourceFile sourceFile) throws IOException {
+        File piFile = new File(sourceFile.getPath().getPath() + ".pi");
+        
+        BufferedReader in;
+        try {
+            in = new BufferedReader(new StringReader(output.readFile(piFile)));
+        } catch (FileNotFoundException e) {
+            Logger.INSTANCE.logWarning("TypeChef did not output a .pi file for " + sourceFile.getPath());
+            return;
+        }
         
         Block currentBlock = null;
         String currentLocation = sourceFile.getPath().getPath();
-        
         
         String line;
         int lineNumber = 0;
@@ -256,14 +283,14 @@ public class TypeChef {
             } else if (line.startsWith("#if")) {
                 String pcStr = line.substring(4);
                 
-                Formula pc = new True();
-                try {
-                    pc = PC_PARSER.parse(pcStr);
-                } catch (ExpressionFormatException e) {
-                    Logger.INSTANCE.logException("Can't parse presence condition " + pcStr, e);
-                }
+//                Formula pc = new True();
+//                try {
+//                    pc = PC_PARSER.parse(pcStr);
+//                } catch (ExpressionFormatException e) {
+//                    Logger.INSTANCE.logException("Can't parse presence condition " + pcStr, e);
+//                }
                 
-                Block newBlock = new Block(pc, currentLocation, lineNumber);
+                Block newBlock = new Block(pcStr, currentLocation, lineNumber);
                 if (currentBlock != null) {
                     currentBlock.setNext(newBlock);
                 }
@@ -273,13 +300,13 @@ public class TypeChef {
                 }
                 
             } else if (line.startsWith("#endif")) {
-                Block newBlock = new Block(new True(), currentLocation, lineNumber);
+                Block newBlock = new Block("", currentLocation, lineNumber);
                 currentBlock.setNext(newBlock);
                 currentBlock = newBlock;
                 
             } else {
                 if (currentBlock == null) {
-                    currentBlock = new Block(new True(), currentLocation, lineNumber);
+                    currentBlock = new Block("", currentLocation, lineNumber);
                 }
                 if (sourceFile.getFirstBlock() == null) {
                     sourceFile.setFirstBlock(currentBlock);
@@ -304,25 +331,8 @@ public class TypeChef {
         }
     }
     
-    /**
-     * Runs TypeChef on a single {@link SourceFile} in the Linux source tree.
-     * the {@link SourceFile} will be filled with {@link Block}s containing the
-     * presence conditions.
-     * 
-     * @param file The {@link SourceFile} in the Linux source tree.
-     * 
-     * @throws IOException If running the TypeChef process or reading its output fails.
-     * @throws IllegalArgumentException If any of the parameters in this object are faulty.
-     */
-    public void runOnFile(SourceFile file) throws IOException, IllegalArgumentException {
+    private int runTypeChef(SourceFile file, File piOutput, File pcFile, File stdOut, File stdErr) throws IOException, IllegalArgumentException {
         checkParameters();
-        
-        File output = new File(file.getPath().getPath().replace('/', '.'));
-        if (!output.mkdir()) {
-            Logger.INSTANCE.logError("Can't create directory " + output.getAbsolutePath());
-            return;
-        }
-        File piFile = new File(output, "chef.pi");
         
         List<String> command = new ArrayList<>();
         command.add(exe.getAbsolutePath());
@@ -332,19 +342,17 @@ public class TypeChef {
         }
         command.add("--lex");
         command.add("--prefixonly=CONFIG_");
-        command.add("--output=" + new File(output, "chef").getAbsolutePath());
+        command.add("--output=" + piOutput.getAbsolutePath().substring(0, piOutput.getAbsolutePath().length() - 3));
         command.add("--writePI");
         command.add("--no-analysis");
         if (file.getPresenceCondition() != null) {
-            File pc = new File(output, "file.pc");
-            
             try {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(pc));
+                BufferedWriter writer = new BufferedWriter(new FileWriter(pcFile));
                 writer.write(file.getPresenceCondition().toString()); // TODO: format
                 writer.newLine();
                 writer.close();
                 
-                command.add("--filePC=" + pc.getAbsolutePath());
+                command.add("--filePC=" + pcFile.getAbsolutePath());
             } catch (IOException e) {
                 Logger.INSTANCE.logException("Can't write presence condition file", e);
             }
@@ -363,33 +371,72 @@ public class TypeChef {
         
         ProcessBuilder builder = new ProcessBuilder(command);
         
-        // TODO: for debug only
-        builder.redirectOutput(Redirect.to(new File(output, "stdout.log")));
-        builder.redirectError(Redirect.to(new File(output, "stderr.log")));
+        builder.redirectOutput(Redirect.to(stdOut));
+        builder.redirectError(Redirect.to(stdErr));
         
         Process chef = builder.start();
         
         int status = -1;
-        try {
-            status = chef.waitFor();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        boolean finished = false;
+        while (!finished) {
+            try {
+                status = chef.waitFor();
+                finished = true;
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        if (status != 0) {
-            String[] lines = new String[command.size() + 2];
-            lines[0] = "A typechef instance exited with status: " + status;
-            lines[1] = "The command was: ";
-            for (int i = 0; i < command.size(); i++) {
-                lines[i + 2] = command.get(i);
+        return status;
+    }
+    
+    /**
+     * Runs TypeChef on a single {@link SourceFile} in the Linux source tree.
+     * the {@link SourceFile} will be filled with {@link Block}s containing the
+     * presence conditions.
+     * 
+     * @param file The {@link SourceFile} in the Linux source tree.
+     * 
+     * @throws IOException If running the TypeChef process or reading its output fails.
+     * @throws IllegalArgumentException If any of the parameters in this object are faulty.
+     */
+    public void runOnFile(SourceFile file) throws IOException, IllegalArgumentException {
+        checkParameters();
+        
+        File piFile = new File(file.getPath().getPath() + ".pi");
+        
+        if (!output.containsFile(piFile)) {
+            File tmpPiOutput = File.createTempFile("typechef", ".tmp.pi", new File("."));
+            File tmpPCfile = File.createTempFile("typechef", ".tmp.pc", new File("."));
+            File stdOut = File.createTempFile("typechef", ".stdout.pc", new File("."));
+            File stdErr = File.createTempFile("typechef", ".stderr.pc", new File("."));
+            
+            int status = runTypeChef(file, tmpPiOutput, tmpPCfile, stdOut, stdErr);
+    
+            if (tmpPiOutput.isFile()) {
+                output.copyFileToArchive(piFile, tmpPiOutput);
+                tmpPiOutput.delete();
             }
-            Logger.INSTANCE.logError(lines); 
-            return;
+            if (tmpPCfile.isFile()) {
+                output.copyFileToArchive(new File(file.getPath().getPath() + ".pc"), tmpPCfile);
+                tmpPCfile.delete();
+            }
+            if (stdOut.isFile()) {
+                output.copyFileToArchive(new File(file.getPath().getPath() + ".stdout"), stdOut);
+                stdOut.delete();
+            }
+            if (stdErr.isFile()) {
+                output.copyFileToArchive(new File(file.getPath().getPath() + ".stderr"), stdErr);
+                stdErr.delete();
+            }
+            
+            if (status != 0) {
+                Logger.INSTANCE.logError("The typechef instance for " + file.getPath() + " exited with status: " + status);
+                return;
+            }
         }
         
-        parseOutput(piFile, file);
-        
-        piFile.delete();
+        parseOutput(file);
     }
     
 }

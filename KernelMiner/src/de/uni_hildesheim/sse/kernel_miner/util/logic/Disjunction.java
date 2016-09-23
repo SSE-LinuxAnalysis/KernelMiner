@@ -1,6 +1,6 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
-public class Disjunction extends Formula {
+public final class Disjunction extends Formula {
 
     private Formula left;
     
@@ -9,6 +9,14 @@ public class Disjunction extends Formula {
     public Disjunction(Formula left, Formula right) {
         this.left = left;
         this.right = right;
+    }
+    
+    public Formula getLeft() {
+        return left;
+    }
+    
+    public Formula getRight() {
+        return right;
     }
     
     @Override

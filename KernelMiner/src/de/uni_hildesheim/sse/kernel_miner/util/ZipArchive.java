@@ -1,13 +1,12 @@
 package de.uni_hildesheim.sse.kernel_miner.util;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 
 import de.schlichtherle.truezip.file.TFile;
-import de.schlichtherle.truezip.file.TFileReader;
+import de.schlichtherle.truezip.file.TFileInputStream;
 import de.schlichtherle.truezip.file.TFileWriter;
 
 /**
@@ -15,7 +14,7 @@ import de.schlichtherle.truezip.file.TFileWriter;
  * 
  * @author Adam Krafczyk
  */
-public class ZipFile {
+public class ZipArchive {
     
     private File zipFile;
     
@@ -26,7 +25,7 @@ public class ZipFile {
      * 
      * @param location The location of the archive file.
      */
-    public ZipFile(File location) {
+    public ZipArchive(File location) {
         zipFile = new TFile(location);
     }
     
@@ -45,7 +44,7 @@ public class ZipFile {
      * Reads the contents of a file in the archive.
      * 
      * @param file The path of the file in the archive.
-     * @return The contents of the file, with \n as line break character.
+     * @return The content of the file.
      * 
      * @throws FileNotFoundException If the archive does not contain the given file.
      * @throws IOException If reading the file fails.
@@ -57,17 +56,11 @@ public class ZipFile {
         
         TFile tfile = new TFile(zipFile, file.getPath());
         
-        BufferedReader in = new BufferedReader(new TFileReader(tfile));
-
-        StringBuffer content = new StringBuffer();
-        String line;
-        while ((line = in.readLine()) != null) {
-            content.append(line).append('\n');
-        }
-        
+        TFileInputStream in = new TFileInputStream(tfile);
+        String content = Files.readFile(in);
         in.close();
         
-        return content.toString();
+        return content;
     }
     
     /**
@@ -101,6 +94,36 @@ public class ZipFile {
         
         TFile tfile = new TFile(zipFile, file.getPath());
         tfile.rm();
+    }
+    
+    /**
+     * Copies or overwrites the given file with the contents of <code>toCopy</code>.
+     * 
+     * @param file The path of the file in the archive.
+     * @param toCopy The "real" file outside the archive to read the content of.
+     * 
+     * @throws FileNotFoundException If <code>toCopy</code> is not found.
+     * @throws IOException If reading or writing the files fails.
+     */
+    public void copyFileToArchive(File file, File toCopy) throws FileNotFoundException, IOException {
+        String content = Files.readFile(toCopy);
+        writeFile(file, content);
+    }
+    
+    /**
+     * Extracts the given file from the archive into the given target file.
+     * The file in the archive remains unchanged.
+     * 
+     * @param file The path of the file in the archive.
+     * @param target The "real" target file outside the archive. This file will
+     *      be overwritten or created with the content from the archive file.
+     *      
+     * @throws FileNotFoundException If the given file in the archive does not exist.
+     * @throws IOException If reading or writing the files fails.
+     */
+    public void extract(File file, File target) throws FileNotFoundException, IOException {
+        String content = readFile(file);
+        Files.writeFile(target, content);
     }
     
 }
