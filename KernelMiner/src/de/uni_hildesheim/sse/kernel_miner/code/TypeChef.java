@@ -290,23 +290,18 @@ public class TypeChef {
         
         in.close();
         
-        if (sourceFile.getFirstBlock() != null) {
-        
-            // remove empty blocks, i.e. blocks generated between #endif and #if with nothing in between
-            currentBlock = sourceFile.getFirstBlock();
-            while (currentBlock != null) {
-                
-                Block next = currentBlock.getNext();
-                while (next != null && next.getLines().size() == 0) {
-                    next = next.getNext();
-                }
-                
-                currentBlock.setNext(next);
-                currentBlock = next;
+        // remove empty blocks, i.e. blocks generated between #endif and #if with nothing in between
+        currentBlock = sourceFile.getFirstBlock();
+        while (currentBlock != null) {
+            
+            Block next = currentBlock.getNext();
+            while (next != null && next.getLines().size() == 0) {
+                next = next.getNext();
             }
-        
+            
+            currentBlock.setNext(next);
+            currentBlock = next;
         }
-        
     }
     
     /**
