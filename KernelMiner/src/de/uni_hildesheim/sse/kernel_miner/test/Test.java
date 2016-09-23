@@ -36,6 +36,7 @@ public class Test {
         
         // for debugging purposes, only selected files can be parsed by the following lines:
 //        files.clear();
+//        files.add(new SourceFile(new File("arch/x86/crypto/aes_glue.c")));
 //        files.add(new SourceFile(new File("kernel/kallsyms.c")));
 //        files.add(new SourceFile(new File("arch/x86/kernel/crash.c")));
 //        files.add(new SourceFile(new File("arch/x86/kernel/fpu/regset.c")));
@@ -44,6 +45,7 @@ public class Test {
     }
     
     public static void main(String[] args) {
+//        Logger.init();
         try {
             Logger.init(new FileOutputStream(new File("global.log")));
         } catch (IOException e) {

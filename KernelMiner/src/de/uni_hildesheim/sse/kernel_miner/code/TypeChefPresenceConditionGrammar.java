@@ -26,6 +26,10 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
     }
 
     private boolean isSubstingEqual(char[] str, int i, String compareTo) {
+        if (i < 0) {
+            return false;
+        }
+        
         for (int j = i; j - i < compareTo.length(); j++) {
             if (str[j] != compareTo.charAt(j - i)) {
                 return false;
@@ -38,6 +42,13 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
     public boolean isOpeningBracketChar(char[] str, int i) {
         if (str[i] != '(') {
             return false;
+        }
+        
+        // check that this is not the bracket of a defined()
+        if (i >= "defined".length()) {
+            if (isSubstingEqual(str, i - "defined".length(), "defined")) {
+                return false;
+            }
         }
         
         // check that this is not the bracket of a definedEx()
@@ -66,6 +77,10 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
             return true;
         }
         
+        if (isSubstingEqual(str, j - "defined".length(), "defined")) {
+            return false;
+        }
+        
         if (isSubstingEqual(str, j - "definedEx".length(), "definedEx")) {
             return false;
         }
@@ -82,11 +97,15 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
     
     @Override
     public Formula makeIdentifierFormula(String identifier) throws ExpressionFormatException {
-        if (!identifier.matches("definedEx\\([a-zA-Z0-9_]+\\)")) {
+        if (!identifier.matches("defined(Ex)?\\([a-zA-Z0-9_]+\\)")) {
             throw new ExpressionFormatException("Identifier \"" + identifier + "\" is not valid definedEx() expression");
         }
         
-        identifier = identifier.substring("definedEx(".length(), identifier.length() - 1);
+        if (identifier.startsWith("definedEx")) {
+            identifier = identifier.substring("definedEx(".length(), identifier.length() - 1);
+        } else {
+            identifier = identifier.substring("defined(".length(), identifier.length() - 1);
+        }
         
         return super.makeIdentifierFormula(identifier);
     }
