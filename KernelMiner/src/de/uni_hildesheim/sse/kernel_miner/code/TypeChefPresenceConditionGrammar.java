@@ -1,8 +1,8 @@
 package de.uni_hildesheim.sse.kernel_miner.code;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.CStyleBooleanGrammar;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
@@ -25,7 +25,7 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
         super(cache);
     }
 
-    private boolean isSubstingEqual(char[] str, int i, String compareTo) {
+    private boolean isSubstringEqual(char[] str, int i, String compareTo) {
         if (i < 0) {
             return false;
         }
@@ -46,14 +46,14 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
         
         // check that this is not the bracket of a defined()
         if (i >= "defined".length()) {
-            if (isSubstingEqual(str, i - "defined".length(), "defined")) {
+            if (isSubstringEqual(str, i - "defined".length(), "defined")) {
                 return false;
             }
         }
         
         // check that this is not the bracket of a definedEx()
         if (i >= "definedEx".length()) {
-            if (isSubstingEqual(str, i - "definedEx".length(), "definedEx")) {
+            if (isSubstringEqual(str, i - "definedEx".length(), "definedEx")) {
                 return false;
             }
         }
@@ -77,11 +77,11 @@ public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
             return true;
         }
         
-        if (isSubstingEqual(str, j - "defined".length(), "defined")) {
+        if (isSubstringEqual(str, j - "defined".length(), "defined")) {
             return false;
         }
         
-        if (isSubstingEqual(str, j - "definedEx".length(), "definedEx")) {
+        if (isSubstringEqual(str, j - "definedEx".length(), "definedEx")) {
             return false;
         }
 

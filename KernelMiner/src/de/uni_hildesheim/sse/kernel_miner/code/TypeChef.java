@@ -11,12 +11,12 @@ import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
@@ -339,6 +339,19 @@ public class TypeChef {
         }
     }
     
+    /**
+     * Runs a TypeChef process with the current configuration and the given output files.
+     * 
+     * @param file The source file in the Linux Kernel source tree to run TypeChef on.
+     * @param piOutput The .pi file where TypeChef should write it's primary lexer output.
+     * @param pcFile The .pc file that should contain the presence condition of the given {@link SourceFile}.
+     * @param stdOut The file that should contain the standard output of TypeChef.
+     * @param stdErr The file that should contain the error output of TypeChef.
+     * @return The process' exit status.
+     * 
+     * @throws IOException If running the process fails.
+     * @throws IllegalArgumentException If any of the parameters of the current configuration is not set correctly.
+     */
     private int runTypeChef(SourceFile file, File piOutput, File pcFile, File stdOut, File stdErr) throws IOException, IllegalArgumentException {
         checkParameters();
         

@@ -8,9 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 

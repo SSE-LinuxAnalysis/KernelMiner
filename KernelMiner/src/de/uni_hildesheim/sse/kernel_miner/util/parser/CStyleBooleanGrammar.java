@@ -1,6 +1,5 @@
 package de.uni_hildesheim.sse.kernel_miner.util.parser;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Conjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Disjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;

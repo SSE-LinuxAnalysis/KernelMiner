@@ -1,10 +1,10 @@
 package de.uni_hildesheim.sse.kernel_miner.kbuild;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.CStyleBooleanGrammar;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 

@@ -3,7 +3,6 @@ package de.uni_hildesheim.sse.kernel_miner.util.parser;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 
 /**
  * Parsers strings based on {@link Grammar}s.
@@ -42,7 +41,7 @@ public class Parser<T> {
      * Lexes the given expression, based on the {@link Grammar} this parser was created for.
      * 
      * @param expression The expression to lex.
-     * @return A flat list of {@link Element} that represent the tokens in the expression.
+     * @return A flat array of {@link Element} that represent the tokens in the expression.
      * 
      * @throws ExpressionFormatException If the expression contains characters not allowed by the {@link Grammar}.
      */
@@ -94,10 +93,17 @@ public class Parser<T> {
     }
     
     /**
-     * Parses the flat list of elements that the lexer found, based on the {@link Grammar}
+     * Parses the flat array of elements that the lexer found, based on the {@link Grammar}
      * this parser was created for.
+     * <p>
+     * For performance purposes, there is only instance of the <code>elements</code>
+     * array. Two indices, <code>min</code> and <code>max</code> are provided,
+     * to indicate which part should be parsed by this method.
+     * </p>
      * 
-     * @param elements The flat list of elements; the output of {@link #lex(String)}.
+     * @param elements The flat array of elements; the output of {@link #lex(String)}.
+     * @param min The lower bound of the part of <code>elements</code> that should be parsed, inclusive.
+     * @param max The upper bound of the part of <code>elements</code> that should be parsed, inclusive.
      * @return The parsed expression.
      * 
      * @throws ExpressionFormatException If the expression denoted by elements is malformed.

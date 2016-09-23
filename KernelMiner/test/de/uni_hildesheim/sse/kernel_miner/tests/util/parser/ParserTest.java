@@ -6,13 +6,13 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.uni_hildesheim.sse.kernel_miner.util.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Conjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Disjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.CStyleBooleanGrammar;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
