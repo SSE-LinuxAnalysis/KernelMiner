@@ -23,9 +23,9 @@ public abstract class Grammar<T> {
      * 
      * @param str The string where the operator may be present.
      * @param i The pointer to the location in <code>str</null> where the operator may be.
-     * @return The operator as a string (e.g. "&&") if a valid operator; <code>null</code> otherwise.
+     * @return The operator or <code>null</code> if <code>i</code> is not pointing to a valid operator.
      */
-    public abstract String getOperator(char[] str, int i);
+    public abstract Operator getOperator(char[] str, int i);
     
     /**
      * Checks whether <code>i</code> points to a whitespace character in the string <code>str</code>.
@@ -65,47 +65,26 @@ public abstract class Grammar<T> {
     public abstract boolean isIdentifierChar(char[] str, int i);
     
     /**
-     * Checks whether the operator <code>toCheck</code> has a higher precedence than <code>comparedTo</code>.
-     * This method is only called on operator Strings, that were returned by {@link #getOperator(String, int)}.
-     * This method is only called with different <code>toCheck</code> and <code>comparedTo</code>, i.e.
-     * <code>toCheck.equals(comparedTo)</code> is always <code>false</code> for the arguments of this method.
-     * 
-     * @param toCheck The operator that may have a higher precedence than <code>comparedTo</code>
-     * @param comparedTo The operator that <code>toCheck</code> is compared against.
-     * @return <code>true</code> if <code>toCheck</code> has a higher operator precedence than <code>comparedTo</code>;
-     *      <code>false</code> otherwise.
-     */
-    public abstract boolean hasHigherPrecendece(String toCheck, String comparedTo);
-    
-    /**
-     * Checks whether the given operator is unary or binary.
-     * 
-     * @param operator The operator to check.
-     * @return <code>true</code> if the operator is binary; <code>false</code> if the operator is unary.
-     */
-    public abstract boolean isBinary(String operator);
-    
-    /**
      * Constructs a {@link Formula} for the given unary operator.
-     * This method is only called on operator Strings, that were returned by {@link #getOperator(String, int)}.
+     * This method is only called on operators, that were returned by {@link #getOperator(String, int)}.
      * 
      * @param operator The unary operator.
      * @param child The {@link Formula} that is "inside" the operator (i.e. it's child in the AST).
      * @return A {@link Formula} representing the operator applied to the child.
      */
-    public abstract T makeUnaryFormula(String operator, T child) throws ExpressionFormatException;
+    public abstract T makeUnaryFormula(Operator operator, T child) throws ExpressionFormatException;
     
     
     /**
      * Constructs a {@link Formula} for the given binary operator.
-     * This method is only called on operator Strings, that were returned by {@link #getOperator(String, int)}.
+     * This method is only called on operators, that were returned by {@link #getOperator(String, int)}.
      * 
      * @param operator The binary operator.
      * @param left The left side of the binary operation.
      * @param right The right side of the binary operation.
      * @return A {@link Formula} representing the binary operation with the given left and right arguments.
      */
-    public abstract T makeBinaryFormula(String operator, T left, T right) throws ExpressionFormatException;
+    public abstract T makeBinaryFormula(Operator operator, T left, T right) throws ExpressionFormatException;
     
     /**
      * Constructs a {@link Formula} from the given identifier.

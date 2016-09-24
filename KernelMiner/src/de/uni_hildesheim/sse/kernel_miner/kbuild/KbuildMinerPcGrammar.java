@@ -6,6 +6,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.CStyleBooleanGrammar;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.Operator;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
 /**
@@ -31,17 +32,17 @@ public class KbuildMinerPcGrammar extends CStyleBooleanGrammar {
     }
     
     @Override
-    public String getOperator(char[] str, int i) {
+    public Operator getOperator(char[] str, int i) {
         if (str[i] == '!' && str[i + 1] != '=') {
-            return "!";
+            return CStyleBooleanGrammar.NOT;
         }
         
         if (str[i] == '&' && str[i + 1] == '&') {
-            return "&&";
+            return CStyleBooleanGrammar.AND;
         }
         
         if (str[i] == '|' && str[i + 1] == '|') {
-            return "||";
+            return CStyleBooleanGrammar.OR;
         }
         
         return null;

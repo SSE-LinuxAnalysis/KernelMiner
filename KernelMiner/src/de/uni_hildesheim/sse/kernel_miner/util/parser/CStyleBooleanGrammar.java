@@ -23,6 +23,12 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
  */
 public class CStyleBooleanGrammar extends Grammar<Formula> {
 
+    protected static final Operator AND = new Operator("&&", true, 2);
+    
+    protected static final Operator OR = new Operator("||", true, 2);
+    
+    protected static final Operator NOT = new Operator("!", false, 1);
+    
     private VariableCache cache;
     
     public CStyleBooleanGrammar(VariableCache cache) {
@@ -30,17 +36,17 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
     }
     
     @Override
-    public String getOperator(char[] str, int i) {
+    public Operator getOperator(char[] str, int i) {
         if (str[i] == '!') {
-            return "!";
+            return NOT;
         }
         
         if (str[i] == '&' && str[i + 1] == '&') {
-            return "&&";
+            return AND;
         }
         
         if (str[i] == '|' && str[i + 1] == '|') {
-            return "||";
+            return OR;
         }
         
         return null;
@@ -69,27 +75,24 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
                 || (str[i] == '_');
     }
 
-    @Override
-    public boolean hasHigherPrecendece(String toCheck, String comparedTo) {
-        return comparedTo.equals("!");
-    }
 
     @Override
-    public boolean isBinary(String operator) {
-        return operator.equals("&&") || operator.equals("||");
-    }
-
-    @Override
-    public Formula makeUnaryFormula(String operator, Formula child) throws ExpressionFormatException {
-        return new Negation(child);
-    }
-
-    @Override
-    public Formula makeBinaryFormula(String operator, Formula left, Formula right) throws ExpressionFormatException {
-        if (operator.equals("&&")) {
-            return new Conjunction(left, right);
+    public Formula makeUnaryFormula(Operator operator, Formula child) throws ExpressionFormatException {
+        if (operator.equals(NOT)) {
+            return new Negation(child);
         } else {
+            throw new ExpressionFormatException("Unkown operator: " + operator);
+        }
+    }
+
+    @Override
+    public Formula makeBinaryFormula(Operator operator, Formula left, Formula right) throws ExpressionFormatException {
+        if (operator.equals(AND)) {
+            return new Conjunction(left, right);
+        } else if (operator.equals(OR)) {
             return new Disjunction(left, right);
+        } else {
+            throw new ExpressionFormatException("Unkown operator: " + operator);
         }
     }
 

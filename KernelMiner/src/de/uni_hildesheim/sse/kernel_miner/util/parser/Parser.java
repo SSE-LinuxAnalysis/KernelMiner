@@ -32,8 +32,8 @@ public class Parser<T> {
      * @throws ExpressionFormatException If the supplied string is not a valid expression for the given {@link Grammar}.
      */
     public T parse(String expression) throws ExpressionFormatException  {
-        Element[] elements = lex(expression);
-        T f = parse(elements, 0, elements.length - 1);
+        Token[] tokens = lex(expression);
+        T f = parse(tokens, 0, tokens.length - 1);
         return f;
     }
 
@@ -41,20 +41,20 @@ public class Parser<T> {
      * Lexes the given expression, based on the {@link Grammar} this parser was created for.
      * 
      * @param expression The expression to lex.
-     * @return A flat array of {@link Element} that represent the tokens in the expression.
+     * @return A flat array of {@link Token} that represent the tokens in the expression.
      * 
      * @throws ExpressionFormatException If the expression contains characters not allowed by the {@link Grammar}.
      */
-    private Element[] lex(String expression) throws ExpressionFormatException {
-        List<Element> result = new LinkedList<>();
+    private Token[] lex(String expression) throws ExpressionFormatException {
+        List<Token> result = new LinkedList<>();
         
         Identifier currentIdentifier = null;
         
         char[] expr = expression.toCharArray();
         
-        // iterate over the string; i is incremented based on which element was identified
+        // iterate over the string; i is incremented based on which token was identified
         for (int i = 0; i < expr.length;) {
-            String op = grammar.getOperator(expr, i);
+            Operator op = grammar.getOperator(expr, i);
             
             if (grammar.isWhitespaceChar(expr, i)) {
                 // whitespaces are ignored
@@ -72,15 +72,15 @@ public class Parser<T> {
                 
             } else if (op != null) {
                 currentIdentifier = null;
-                result.add(new Operator(op));
-                i += op.length();
+                result.add(op);
+                i += op.getSymbol().length();
                 
             } else if (grammar.isIdentifierChar(expr, i)) {
                 if (currentIdentifier == null) {
-                    currentIdentifier = new Identifier();
+                    currentIdentifier = new Identifier("");
                     result.add(currentIdentifier);
                 }
-                currentIdentifier.name.append(expr[i]);
+                currentIdentifier.setName(currentIdentifier.getName() + expr[i]);
                 i++;
                 
             } else {
@@ -89,54 +89,54 @@ public class Parser<T> {
             }
         }
         
-        return result.toArray(new Element[0]);
+        return result.toArray(new Token[0]);
     }
     
     /**
-     * Parses the flat array of elements that the lexer found, based on the {@link Grammar}
+     * Parses the flat array of tokens that the lexer found, based on the {@link Grammar}
      * this parser was created for.
      * <p>
-     * For performance purposes, there is only instance of the <code>elements</code>
+     * For performance purposes, there is only instance of the <code>tokens</code>
      * array. Two indices, <code>min</code> and <code>max</code> are provided,
      * to indicate which part should be parsed by this method.
      * </p>
      * 
-     * @param elements The flat array of elements; the output of {@link #lex(String)}.
-     * @param min The lower bound of the part of <code>elements</code> that should be parsed, inclusive.
-     * @param max The upper bound of the part of <code>elements</code> that should be parsed, inclusive.
+     * @param tokens The flat array of tokens; the output of {@link #lex(String)}.
+     * @param min The lower bound of the part of <code>tokens</code> that should be parsed, inclusive.
+     * @param max The upper bound of the part of <code>tokens</code> that should be parsed, inclusive.
      * @return The parsed expression.
      * 
-     * @throws ExpressionFormatException If the expression denoted by elements is malformed.
+     * @throws ExpressionFormatException If the expression denoted by tokens is malformed.
      */
-    private T parse(Element[] elements, int min, int max) throws ExpressionFormatException {
+    private T parse(Token[] tokens, int min, int max) throws ExpressionFormatException {
         // this method calls itself recursively
 
-        // if we have  no elements left then something went wrong
+        // if we have  no tokens left then something went wrong
         if (max - min < 0) {
             throw new ExpressionFormatException("Expected identifier");
         }
         
-        // if we only have one element left, then it must be an identifier
+        // if we only have one token left, then it must be an identifier
         if (max - min == 0) {
-            if (!(elements[min] instanceof Identifier)) {
-                throw new ExpressionFormatException("Expected identifier, got " + elements[min]);
+            if (!(tokens[min] instanceof Identifier)) {
+                throw new ExpressionFormatException("Expected identifier, got " + tokens[min]);
             }
             
-            return grammar.makeIdentifierFormula(((Identifier) elements[min]).name.toString());
+            return grammar.makeIdentifierFormula(((Identifier) tokens[min]).getName());
         }
         
         // find the "highest" operator in the bracket tree
         
         int highestOperatorLevel = -1;
         int highestOpPos = -1;
-        String highestOp = null;
+        Operator highestOp = null;
         
         int bracketDepth = 0;
         
         for (int i = min; i <= max; i++) {
-            Element e = elements[i];
+            Token e = tokens[i];
             if (e instanceof Bracket) {
-                if (((Bracket) e).closing) {
+                if (((Bracket) e).isClosing()) {
                     bracketDepth--;
                 } else {
                     bracketDepth++;
@@ -151,17 +151,16 @@ public class Parser<T> {
                 
                 // if ...
                 if (
-                        highestOperatorLevel == -1 // .. we haven't found any operator yet
+                        highestOp == null // .. we haven't found any operator yet
                         || bracketDepth < highestOperatorLevel // ... the current operator is "higher" in the bracket structure
                         || (
                                 highestOperatorLevel == bracketDepth
-                                && !highestOp.equals(op.op)
-                                && grammar.hasHigherPrecendece(op.op, highestOp)
+                                && op.getPrecedence() > highestOp.getPrecedence()
                         ) // ... the current operator has the same level as the previously found one, but
                           // it has a higher precedence
                 ) {
                     highestOpPos = i;
-                    highestOp = op.op;
+                    highestOp = op;
                     highestOperatorLevel = bracketDepth;
                 }
             }
@@ -178,9 +177,9 @@ public class Parser<T> {
             // recursively parse the nested parts based on whether the operator is binary or not
             // and pass the results to the grammer to create the result
             
-            if (grammar.isBinary(highestOp)) {
-                T leftTree = parse(elements, min, highestOpPos - 1);
-                T rightTree = parse(elements, highestOpPos + 1, max);
+            if (highestOp.isBinary()) {
+                T leftTree = parse(tokens, min, highestOpPos - 1);
+                T rightTree = parse(tokens, highestOpPos + 1, max);
                 result = grammar.makeBinaryFormula(highestOp, leftTree, rightTree);
                 
             } else {
@@ -188,75 +187,28 @@ public class Parser<T> {
                     throw new ExpressionFormatException("Unary operator is not on the left");
                 }
                 
-                T childFormula = parse(elements, min + 1, max);
+                T childFormula = parse(tokens, min + 1, max);
                 result = grammar.makeUnaryFormula(highestOp, childFormula);
                 
             }
         } else {
             // unpack the brackets and recursively call parse()
             
-            if (!(elements[min] instanceof Bracket) || !(elements[max] instanceof Bracket)) {
+            if (!(tokens[min] instanceof Bracket) || !(tokens[max] instanceof Bracket)) {
                 throw new ExpressionFormatException("Couldn't find operator");
             }
             
-            Bracket first = (Bracket) elements[min];
-            Bracket last = (Bracket) elements[max];
+            Bracket first = (Bracket) tokens[min];
+            Bracket last = (Bracket) tokens[max];
             
-            if (first.closing || !last.closing) {
+            if (first.isClosing() || !last.isClosing()) {
                 throw new ExpressionFormatException("Unbalanced brackets");
             }
             
-            result = parse(elements, min + 1, max - 1);
+            result = parse(tokens, min + 1, max - 1);
         }
         
         return result;
-    }
-    
-    /**
-     * A token identified by the lexer. One of the three child classes:
-     * <ul>
-     *      <li>{@link Bracket}</li>
-     *      <li>{@link Operator}</li>
-     *      <li>{@link Identifier}</li>
-     * </ul>
-     */
-    private abstract static class Element {
-    }
-    
-    private static final class Operator extends Element {
-        private String op;
-        
-        public Operator(String op) {
-            this.op = op;
-        }
-        
-        @Override
-        public String toString() {
-            return "[Operator: " + op + "]";
-        }
-    }
-    
-    private static final class Identifier extends Element {
-        private StringBuffer name = new StringBuffer();
-        
-        @Override
-        public String toString() {
-            return "[Identifier: " + name + "]";
-        }
-    }
-    
-    private static final class Bracket extends Element {
-        private boolean closing;
-        
-        public Bracket(boolean closing) {
-            this.closing = closing;
-        }
-        
-        
-        @Override
-        public String toString() {
-            return "[Bracket: " + (closing ? "closing" : "open") + "]";
-        }
     }
     
 }
