@@ -1,7 +1,7 @@
 package de.uni_hildesheim.sse.kernel_miner.util.parser;
 
 /**
- * A token identified by the lexer. One of the three child classes:
+ * A token of an expression to be parsed. One of the three child classes:
  * <ul>
  *      <li>{@link Bracket}</li>
  *      <li>{@link Operator}</li>

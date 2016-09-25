@@ -242,7 +242,7 @@ public class ParserTest {
     
     private static void assertVariable(Formula f, String expectedName) {
         assertTrue(f instanceof Variable);
-        assertEquals(expectedName, ((Variable) f).toString());
+        assertEquals(expectedName, ((Variable) f).getName());
     }
     
     private static Formula assertNegation(Formula f) {

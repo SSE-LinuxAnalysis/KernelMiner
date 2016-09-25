@@ -1,6 +1,7 @@
 package de.uni_hildesheim.sse.kernel_miner.code;
 
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.CStyleBooleanGrammar;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
@@ -21,10 +22,26 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
  */
 public class TypeChefPresenceConditionGrammar extends CStyleBooleanGrammar {
     
+    /**
+     * Creates this grammar with the given variable cache. The cache is used
+     * to create every single {@link Variable}, to ensure that no two different
+     * {@link Variable} objects with the same variable name exist.
+     * 
+     * @param cache The cache to use, or <code>null</code>.
+     */
     public TypeChefPresenceConditionGrammar(VariableCache cache) {
         super(cache);
     }
 
+    /**
+     * Checks whether <code>i</code> points to a sub-string equal to <code>compareTo</code> in <code>str</code>.
+     * 
+     * @param str The string, that may contain the sub-string <code>compareTo</code>.
+     * @param i The pointer to the position in <code>str</code> to check.
+     * @param compareTo The sub-string, that may be present in <code>str</code>.
+     * @return <code>true</code> if <code>i</code> points to a sub-string equal to
+     *      <code>compareTo</code> in <code>str</code>; <code>false</code> otherwise.
+     */
     private boolean isSubstringEqual(char[] str, int i, String compareTo) {
         if (i < 0) {
             return false;

@@ -237,7 +237,7 @@ public class KbuildMinerPcGrammarTest {
     
     private static void assertVariable(Formula f, String expectedName) {
         Assert.assertTrue(f instanceof Variable);
-        Assert.assertEquals(expectedName, ((Variable) f).toString());
+        Assert.assertEquals(expectedName, ((Variable) f).getName());
     }
     
     private static Formula assertNegation(Formula f) {

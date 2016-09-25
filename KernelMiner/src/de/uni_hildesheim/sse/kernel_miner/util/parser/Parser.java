@@ -5,7 +5,7 @@ import java.util.List;
 
 
 /**
- * Parsers strings based on {@link Grammar}s.
+ * Parses strings based on {@link Grammar}s.
  * 
  * @author Adam Krafczyk
  */
@@ -41,7 +41,7 @@ public class Parser<T> {
      * Lexes the given expression, based on the {@link Grammar} this parser was created for.
      * 
      * @param expression The expression to lex.
-     * @return A flat array of {@link Token} that represent the tokens in the expression.
+     * @return A flat array of {@link Token}s found in the expression.
      * 
      * @throws ExpressionFormatException If the expression contains characters not allowed by the {@link Grammar}.
      */

@@ -1,15 +1,35 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
+/**
+ * A boolean variable.
+ * 
+ * @author Adam Krafczyk
+ */
 public final class Variable extends Formula {
     
     private String name;
     
     private boolean value;
     
+    /**
+     * Creates a boolean variable.
+     * 
+     * @param name The name of this variable.
+     */
     public Variable(String name) {
         this.name = name;
     }
     
+    /**
+     * @return The name of this variable.
+     */
+    public String getName() {
+        return name;
+    }
+    
+    /**
+     * @param value The value of this variable. Will be returned by {@link #evaluate()}.
+     */
     public void setValue(boolean value) {
         this.value = value;
     }

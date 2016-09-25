@@ -1,20 +1,38 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
+
+/**
+ * A boolean conjunction operator (AND).
+ * 
+ * @author Adam Krafczyk
+ */
 public final class Conjunction extends Formula {
 
     private Formula left;
     
     private Formula right;
     
+    /**
+     * Creates a boolean conjunction (AND).
+     * 
+     * @param left The left operand.
+     * @param right The right operand.
+     */
     public Conjunction(Formula left, Formula right) {
         this.left = left;
         this.right = right;
     }
     
+    /**
+     * @return The left operand.
+     */
     public Formula getLeft() {
         return left;
     }
     
+    /**
+     * @return The right operand.
+     */
     public Formula getRight() {
         return right;
     }

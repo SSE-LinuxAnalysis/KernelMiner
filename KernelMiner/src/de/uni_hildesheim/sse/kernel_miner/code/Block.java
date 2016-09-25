@@ -92,7 +92,7 @@ public class Block {
      * This is done by checking whether there are any non-empty lines inside this block.
      * <br />
      * <br />
-     * TODO: This heuristic is not very good, since blocks may only contain comments.
+     * TODO: This heuristic is not very good, since blocks may contain only comments.
      * 
      * @return <code>true</code> if this block contains non-empty lines.
      */

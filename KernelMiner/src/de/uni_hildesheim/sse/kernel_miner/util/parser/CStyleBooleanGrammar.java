@@ -31,6 +31,13 @@ public class CStyleBooleanGrammar extends Grammar<Formula> {
     
     private VariableCache cache;
     
+    /**
+     * Creates this grammar with the given variable cache. The cache is used
+     * to create every single {@link Variable}, to ensure that no two different
+     * {@link Variable} objects with the same variable name exist.
+     * 
+     * @param cache The cache to use, or <code>null</code>.
+     */
     public CStyleBooleanGrammar(VariableCache cache) {
         this.cache = cache;
     }
