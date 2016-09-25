@@ -3,7 +3,6 @@ package de.uni_hildesheim.sse.kernel_miner.test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -11,7 +10,6 @@ import de.uni_hildesheim.sse.kernel_miner.code.Block;
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
 import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
-import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
@@ -62,40 +60,6 @@ public class Test {
         }
     }
     
-    private static void deleteDir(File dir) {
-        for (File f : dir.listFiles()) {
-            if (f.isDirectory()) {
-                deleteDir(f);
-            } else {
-                f.delete();
-            }
-        }
-        dir.delete();
-    }
-    
-    private static void compressDir(File dir) throws IOException {
-        List<String> command = new LinkedList<>();
-        command.add("tar");
-        command.add("-czf");
-        command.add(dir.getAbsolutePath() + ".tar.gz");
-        for (File f : dir.listFiles()) {
-            command.add(Files.relativize(f, new File(dir.getAbsolutePath()).getParentFile()));
-        }
-        
-        ProcessBuilder bldr = new ProcessBuilder(command);
-        Process p = bldr.start();
-        int status = -1;
-        try {
-            status = p.waitFor();
-        } catch (InterruptedException e) {
-        }
-        if (status == 0) {
-            deleteDir(dir);
-        } else {
-            Logger.INSTANCE.logError("Can't compress dir " + dir);
-        }
-    }
-    
     private static void writeCsv(SourceFile file, ZipArchive output) throws IOException {
         StringBuffer content = new StringBuffer();
         
@@ -117,8 +81,6 @@ public class Test {
     
     private static void runOnFile(SourceFile file) {
         Logger.INSTANCE.logInfo("Starting on file " + file.getPath());
-        File dir = new File(file.getPath().getPath().replace('/', '.'));
-        
         try {
             TypeChef chef = new TypeChef(new File(BASE_DIR, "linux-releases/linux-4.4"),
                     new File(BASE_DIR, "kconfig_models/linux-4.4"));
@@ -138,14 +100,6 @@ public class Test {
             
         } catch (IllegalArgumentException | IOException e) {
             Logger.INSTANCE.logException("Caught exception for file " + file.getPath(), e);
-        }
-        
-        if (dir.isDirectory()) {
-            try {
-                compressDir(dir);
-            } catch (IOException e) {
-                Logger.INSTANCE.logException("Caught exception while compressing dir for file " + file.getPath(), e);
-            }
         }
         
     }
