@@ -11,6 +11,7 @@ import de.uni_hildesheim.sse.kernel_miner.tests.util.parser.ParserTest;
 @SuiteClasses({
     FilesTest.class,
     FormulaTest.class,
+    LoggerTest.class,
     ParserTest.class,
     ZipArchiveTest.class,
 })
