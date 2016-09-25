@@ -7,7 +7,9 @@ import org.junit.runners.Suite.SuiteClasses;
 import de.uni_hildesheim.sse.kernel_miner.tests.util.AllUtilTests;
 
 @RunWith(Suite.class)
-@SuiteClasses({AllUtilTests.class})
+@SuiteClasses({
+    AllUtilTests.class,
+})
 public class AllKernelMinerTests {
 
 }

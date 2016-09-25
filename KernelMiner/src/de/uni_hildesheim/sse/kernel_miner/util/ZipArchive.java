@@ -57,7 +57,7 @@ public class ZipArchive {
         TFile tfile = new TFile(zipFile, file.getPath());
         
         TFileInputStream in = new TFileInputStream(tfile);
-        String content = Files.readFile(in);
+        String content = Files.readStream(in);
         in.close();
         
         return content;

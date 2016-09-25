@@ -29,7 +29,7 @@ public class Files {
         return content.toString();
     }
     
-    public static String readFile(InputStream in) throws IOException {
+    public static String readStream(InputStream in) throws IOException {
         return readStream(in, Charset.forName("UTF-8"));
     }
     

@@ -99,7 +99,7 @@ public class FilesTest {
     public void testReadStreamShortText() throws IOException {
         String expected = "This is a test text";
         
-        String content = Files.readFile(new ByteArrayInputStream(expected.getBytes()));
+        String content = Files.readStream(new ByteArrayInputStream(expected.getBytes()));
         
         Assert.assertEquals(expected, content);
     }
@@ -109,7 +109,7 @@ public class FilesTest {
         String expected = "This is a longer text. It contains more than 512 characters, to check the case that more than one buffer needs to be used.\n";
         expected = expected + expected + expected + expected;
         
-        String content = Files.readFile(new ByteArrayInputStream(expected.getBytes()));
+        String content = Files.readStream(new ByteArrayInputStream(expected.getBytes()));
         
         Assert.assertEquals(expected, content);
     }
