@@ -71,6 +71,20 @@ public class ParserTest {
     }
     
     @Test
+    public void testPrecedence() throws ExpressionFormatException {
+        VariableCache cache = new VariableCache();
+        Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
+        String str = "!A && B";
+        
+        Formula f = parser.parse(str);
+        
+        Formula[] t = assertConjunction(f);
+        assertVariable(assertNegation(t[0]), "A");
+        assertVariable(t[1], "B");
+        Assert.assertEquals(2, cache.getNumVariables());
+    }
+    
+    @Test
     public void testSimpleParenthesis1() throws ExpressionFormatException {
         VariableCache cache = new VariableCache();
         Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
