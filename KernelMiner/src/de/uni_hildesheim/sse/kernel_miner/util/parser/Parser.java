@@ -58,6 +58,7 @@ public class Parser<T> {
             
             if (grammar.isWhitespaceChar(expr, i)) {
                 // whitespaces are ignored
+                currentIdentifier = null;
                 i++;
                 
             } else  if (grammar.isOpeningBracketChar(expr, i)) {

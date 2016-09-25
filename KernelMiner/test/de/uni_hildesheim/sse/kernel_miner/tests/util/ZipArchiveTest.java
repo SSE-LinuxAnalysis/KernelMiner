@@ -87,6 +87,21 @@ public class ZipArchiveTest {
     }
     
     @Test
+    public void testDeleteNonExissting() throws IOException {
+        File zipFile = new File(testdata, "archive.zip");
+        ZipArchive archive = new ZipArchive(zipFile);
+        
+        Assert.assertFalse(archive.containsFile(new File("doesntExist.txt")));
+        
+        try {
+            archive.deleteFile(new File("doesntExist.txt"));
+            Assert.fail("Expected exception");
+        } catch (FileNotFoundException e) {
+            
+        }
+    }
+    
+    @Test
     public void testOverwriteFile() throws IOException {
         File zipFile = new File(testdata, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);

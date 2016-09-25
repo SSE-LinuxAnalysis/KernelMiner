@@ -144,6 +144,102 @@ public class ParserTest {
         Assert.assertEquals(11, cache.getNumVariables());
     }
     
+    @Test
+    public void testMalformedBrackets() {
+        VariableCache cache = new VariableCache();
+        Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
+        
+        try {
+            parser.parse("((A)");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("(A))");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+    }
+    
+    @Test
+    public void testMalformedMissingIdentifier() {
+        VariableCache cache = new VariableCache();
+        Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
+        
+        try {
+            parser.parse("");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("()");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("||");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("(||)");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+    }
+    
+    @Test
+    public void testMalformedOperator() {
+        VariableCache cache = new VariableCache();
+        Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
+        
+        try {
+            parser.parse("A &&");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("A!");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("A B");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("A & B");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+        
+        try {
+            parser.parse("A | B");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+    }
+    
+    @Test
+    public void testMalformedCharacter() {
+        VariableCache cache = new VariableCache();
+        Parser<Formula> parser = new Parser<>(new CStyleBooleanGrammar(cache));
+        
+        try {
+            parser.parse("A && BÜ");
+            Assert.fail("Expected exception");
+        } catch (ExpressionFormatException e) {
+        }
+    }
+    
     private static void assertVariable(Formula f, String expectedName) {
         assertTrue(f instanceof Variable);
         assertEquals(expectedName, ((Variable) f).toString());
@@ -165,5 +261,5 @@ public class ParserTest {
         Disjunction c = (Disjunction) f;
         return new Formula[] {c.getLeft(), c.getRight()};
     }
-
+    
 }
