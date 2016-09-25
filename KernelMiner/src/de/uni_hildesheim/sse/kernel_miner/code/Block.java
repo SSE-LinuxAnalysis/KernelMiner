@@ -119,7 +119,6 @@ public class Block {
                     }
                     
                     if (!inBlockComment && !Character.isWhitespace(chars[i])) {
-                        System.out.println(chars[i]);
                         return true;
                     }
                 }
