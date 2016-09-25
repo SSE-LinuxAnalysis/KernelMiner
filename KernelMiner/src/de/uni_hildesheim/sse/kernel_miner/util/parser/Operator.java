@@ -26,4 +26,9 @@ public final class Operator extends Token {
         return precedence;
     }
     
+    @Override
+    public String toString() {
+        return "[Operator: " + symbol + "]";
+    }
+    
 }

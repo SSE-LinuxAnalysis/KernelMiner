@@ -49,13 +49,35 @@ public class KbuildMinerPcGrammar extends CStyleBooleanGrammar {
     }
     
     @Override
+    public boolean isWhitespaceChar(char[] str, int i) {
+        if (super.isWhitespaceChar(str, i)) {
+            // make sure that spaces around != and == don't interrupt the identifier
+            
+            if (i >= 2) {
+                if (str[i - 1] == '=' && (str[i - 2] == '!' || str[i - 2] == '=')) {
+                    return false;
+                }
+            }
+            if (i < str.length - 2) {
+                if ((str[i + 1] == '!' || str[i + 1] == '=') && str[i + 2] == '=') {
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        return false;
+    }
+    
+    @Override
     public boolean isIdentifierChar(char[] str, int i) {
         return super.isIdentifierChar(str, i)
                 || (str[i] == '!')
                 || (str[i] == '=')
                 || (str[i] == '"')
                 || (str[i] == '[')
-                || (str[i] == ']');
+                || (str[i] == ']')
+                || (str[i] == ' ');
     }
     
     @Override
@@ -69,6 +91,8 @@ public class KbuildMinerPcGrammar extends CStyleBooleanGrammar {
         }
 
         if (identifier.contains("==")) {
+            identifier = identifier.replace(" =", "=").replace("= ", "=");
+            
             int equalPos = identifier.indexOf('=');
             String varName = identifier.substring(0, equalPos);
             

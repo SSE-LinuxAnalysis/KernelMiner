@@ -12,4 +12,9 @@ public final class Bracket extends Token {
         return closing;
     }
     
+    @Override
+    public String toString() {
+        return "[Bracket: " + (closing ? "closing" : "open") + "]";
+    }
+    
 }
