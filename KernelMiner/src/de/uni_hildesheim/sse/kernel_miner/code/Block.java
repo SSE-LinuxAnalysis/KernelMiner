@@ -90,31 +90,43 @@ public class Block {
     /**
      * Heuristically checks whether there is actual code inside this block.
      * This is done by checking whether there are any non-empty lines inside this block.
-     * <br />
-     * <br />
-     * TODO: This heuristic is not very good, since blocks may contain only comments.
+     * Comments are considered, too.
      * 
      * @return <code>true</code> if this block contains non-empty lines.
      */
     public boolean containsCode() {
-        boolean containsCode = false;
+        boolean inBlockComment = false;
         
         for (String line : lines) {
             if (line.length() > 0) {
-                for (char c : line.toCharArray()) {
-                    if (!Character.isWhitespace(c)) {
-                        containsCode = true;
+                char[] chars = line.toCharArray();
+                for (int i = 0; i < chars.length; i++) {
+                    if (!inBlockComment && i < chars.length - 1 && chars[i] == '/' && chars[i + 1] == '*') {
+                        inBlockComment = true;
+                        i++;
+                        continue;
+                    }
+                    
+                    if (inBlockComment && i < chars.length - 1 && chars[i] == '*' && chars[i + 1] == '/') {
+                        inBlockComment = false;
+                        i++;
+                        continue;
+                    }
+                    
+                    if (!inBlockComment && i < chars.length - 1 && chars[i] == '/' && chars[i + 1] == '/') {
+                        i++;
                         break;
+                    }
+                    
+                    if (!inBlockComment && !Character.isWhitespace(chars[i])) {
+                        System.out.println(chars[i]);
+                        return true;
                     }
                 }
             }
-            
-            if (containsCode) {
-                break;
-            }
         }
         
-        return containsCode;
+        return false;
     }
 
 }
