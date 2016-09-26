@@ -34,6 +34,7 @@ public class TypeChefTest {
         
         chef.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
         chef.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
+        chef.addSourceIncludeDir(new File("include"));
         
         File output = File.createTempFile("typechef_output", ".zip", TESTDATA);
         output.delete();
@@ -82,8 +83,43 @@ public class TypeChefTest {
         Assert.assertTrue(block.getPresenceCondition() instanceof True);
         
         Assert.assertFalse(it.hasNext());
+    }
+    
+    @Test
+    public void testIncludes() throws IOException {
+        TypeChef chef = createTypeChef("simpleFile");
+        SourceFile file = new SourceFile(new File("includingFile.c"));
+        chef.runOnFile(file);
+        
+        Iterator<Block> it = file.getBlocks().iterator();
+        
+        Assert.assertTrue(it.hasNext());
+        Block block = it.next();
+        Assert.assertTrue(block.getLocation().endsWith("res/typechef/platform.h"));
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertTrue(block.getLocation().endsWith("res/typechef/partial_conf.h"));
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
         
         
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertTrue(block.getLocation().endsWith("usr/include/someSystemHeader.h"));
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertEquals("include/someProjectHeader.h", block.getLocation());
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertEquals("includingFile.c", block.getLocation());
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
+        Assert.assertFalse(it.hasNext());
     }
     
     private static void assertVariable(Formula f, String expectedName) {
