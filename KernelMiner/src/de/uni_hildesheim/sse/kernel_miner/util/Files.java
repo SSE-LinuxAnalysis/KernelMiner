@@ -1,5 +1,6 @@
 package de.uni_hildesheim.sse.kernel_miner.util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -37,18 +38,14 @@ public class Files {
      * @throws IOException If reading the stream throws an exception.
      */
     public static String readStream(InputStream in, Charset charset) throws IOException {
-        StringBuffer content = new StringBuffer();
-        byte[] buf = new byte[512];
-        int read = 0;
-        do {
-            read = in.read(buf);
-            if (read > 0) {
-                // TODO: this might cut UTF-8 characters in half
-                content.append(new String(buf, 0, read, charset));
-            }
-        } while (read != -1);
+        ByteArrayOutputStream content = new ByteArrayOutputStream(512);
         
-        return content.toString();
+        int read;
+        while ((read = in.read()) != -1) {
+            content.write(read);
+        }
+        
+        return new String(content.toByteArray(), charset);
     }
     
     /**

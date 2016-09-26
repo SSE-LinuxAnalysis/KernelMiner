@@ -117,9 +117,7 @@ public class FilesTest {
     @Test
     public void testWriteFile() throws IOException {
         File toWrite = new File(testdata, "testWriteFile.txt");
-        if (toWrite.exists()) {
-            toWrite.delete();
-        }
+        toWrite.deleteOnExit();
         Assert.assertFalse(toWrite.exists());
         
         String content = "This is a test text.\nLine 2\n";
@@ -134,9 +132,7 @@ public class FilesTest {
     @Test
     public void testOverwriteFile() throws IOException {
         File toWrite = new File(testdata, "testOverwriteFile.txt");
-        if (toWrite.exists()) {
-            toWrite.delete();
-        }
+        toWrite.deleteOnExit();
         Assert.assertFalse(toWrite.exists());
         
         String content1 = "Text 1\n";
