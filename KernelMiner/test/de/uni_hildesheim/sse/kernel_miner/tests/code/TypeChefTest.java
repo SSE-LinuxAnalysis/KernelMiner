@@ -29,8 +29,8 @@ public class TypeChefTest {
         Logger.init();
     }
     
-    private TypeChef createTypeChef(String kconfigName) throws IOException {
-        TypeChef chef = new TypeChef(new File(TESTDATA, "src"), new File(TESTDATA, "models/" + kconfigName));
+    private TypeChef createTypeChef() throws IOException {
+        TypeChef chef = new TypeChef(new File(TESTDATA, "src"), new File(TESTDATA, "models/model"));
         
         chef.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
         chef.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
@@ -46,7 +46,7 @@ public class TypeChefTest {
 
     @Test
     public void testSimpleFile() throws IOException {
-        TypeChef chef = createTypeChef("simpleFile");
+        TypeChef chef = createTypeChef();
         SourceFile file = new SourceFile(new File("simpleFile.c"));
         chef.runOnFile(file);
         
@@ -87,7 +87,7 @@ public class TypeChefTest {
     
     @Test
     public void testIncludes() throws IOException {
-        TypeChef chef = createTypeChef("simpleFile");
+        TypeChef chef = createTypeChef();
         SourceFile file = new SourceFile(new File("includingFile.c"));
         chef.runOnFile(file);
         
