@@ -238,7 +238,7 @@ public class TypeChef {
         if (!exe.isFile()) {
             throw new IllegalArgumentException("Executable \"" + exe + "\" does not exist");
         }
-        if (!exe.canExecute()) {
+        if (!exe.canExecute() && !exe.getName().endsWith(".jar")) {
             throw new IllegalArgumentException("Executable \"" + exe + "\" can't be executed");
         }
         
