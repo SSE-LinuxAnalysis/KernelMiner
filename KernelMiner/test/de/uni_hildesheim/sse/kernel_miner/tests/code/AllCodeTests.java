@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
     BlockTest.class,
     TypeChefPresenceConditionGrammarTest.class,
+    TypeChefTest.class,
 })
 public class AllCodeTests {
 

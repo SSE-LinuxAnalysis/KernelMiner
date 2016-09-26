@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
@@ -293,7 +295,7 @@ public class TypeChef {
             return;
         }
         
-        Block currentBlock = null;
+        List<Block> blocks = new LinkedList<>();
         String currentLocation = sourceFile.getPath().getPath();
         
         String line;
@@ -305,6 +307,12 @@ public class TypeChef {
                 String[] parts = line.split(" ");
                 currentLocation = parts[2].substring(1, parts[2].length() - 1);
                 currentLocation = Files.relativize(new File(currentLocation), sourceDir);
+                if (!blocks.isEmpty()) {
+                    Block lastBlock = blocks.get(blocks.size() - 1);
+                    if (!currentLocation.equals(lastBlock.getLocation())) {
+                        blocks.add(new Block(new True(), currentLocation, lineNumber));
+                    }
+                }
                 
             } else if (line.startsWith("#if")) {
                 String pcStr = line.substring(4);
@@ -317,45 +325,30 @@ public class TypeChef {
                 }
                 PC_CACHE.clear();
                 
-                Block newBlock = new Block(pc, currentLocation, lineNumber);
-                if (currentBlock != null) {
-                    currentBlock.setNext(newBlock);
-                }
-                currentBlock = newBlock;
-                if (sourceFile.getFirstBlock() == null) {
-                    sourceFile.setFirstBlock(currentBlock);
-                }
+                blocks.add(new Block(pc, currentLocation, lineNumber));
                 
             } else if (line.startsWith("#endif")) {
-                Block newBlock = new Block(new True(), currentLocation, lineNumber);
-                currentBlock.setNext(newBlock);
-                currentBlock = newBlock;
+                blocks.add(new Block(new True(), currentLocation, lineNumber));
                 
             } else {
-                if (currentBlock == null) {
-                    currentBlock = new Block(new True(), currentLocation, lineNumber);
+                if (blocks.isEmpty()) {
+                    blocks.add(new Block(new True(), currentLocation, lineNumber));
                 }
-                if (sourceFile.getFirstBlock() == null) {
-                    sourceFile.setFirstBlock(currentBlock);
-                }
-                currentBlock.addLine(line);
+                blocks.get(blocks.size() - 1).addLine(line);
             }
         }
         
         in.close();
         
         // remove empty blocks, i.e. blocks generated between #endif and #if with nothing in between
-        currentBlock = sourceFile.getFirstBlock();
-        while (currentBlock != null) {
-            
-            Block next = currentBlock.getNext();
-            while (next != null && next.getLines().size() == 0) {
-                next = next.getNext();
-            }
-            
-            currentBlock.setNext(next);
-            currentBlock = next;
+        for (Iterator<Block> it = blocks.iterator(); it.hasNext();) {
+               Block block = it.next();
+               if (block.getLines().isEmpty()) {
+                   it.remove();
+               }
         }
+        
+        sourceFile.setBlocks(blocks);
     }
     
     /**

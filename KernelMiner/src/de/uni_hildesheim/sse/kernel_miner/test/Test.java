@@ -63,12 +63,12 @@ public class Test {
     private static void writeCsv(SourceFile file, ZipArchive output) throws IOException {
         StringBuffer content = new StringBuffer();
         
-        for (Block currentBlock = file.getFirstBlock(); currentBlock != null; currentBlock = currentBlock.getNext()) {
-            if (currentBlock.containsCode() && !(currentBlock.getPresenceCondition() instanceof True)) {
+        for (Block block : file.getBlocks()) {
+            if (block.containsCode() && !(block.getPresenceCondition() instanceof True)) {
                 content.append(file.getPath().getPath()).append(";")
-                        .append(currentBlock.getPiLineNumber()).append(";")
-                        .append(currentBlock.getLocation()).append(";")
-                        .append(currentBlock.getPresenceCondition().toString()) // TODO: format
+                        .append(block.getPiLineNumber()).append(";")
+                        .append(block.getLocation()).append(";")
+                        .append(block.getPresenceCondition().toString()) // TODO: format
                         .append("\n");
             }
         }
@@ -89,7 +89,7 @@ public class Test {
             chef.runOnFile(file);
             
             
-            if (file.getFirstBlock() != null) {
+            if (!file.getBlocks().isEmpty()) {
                 writeCsv(file, chef.getOutput());
                 Logger.INSTANCE.logInfo("Finished file " + file.getPath(),
                         files.size() + " files left");

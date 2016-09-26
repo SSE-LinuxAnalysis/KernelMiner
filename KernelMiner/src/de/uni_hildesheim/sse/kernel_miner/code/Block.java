@@ -15,8 +15,6 @@ public class Block {
     
     private Formula presenceCondition;
     
-    private Block next;
-    
     private String location;
     
     private int piLineNumber;
@@ -56,21 +54,6 @@ public class Block {
      */
     public Formula getPresenceCondition() {
         return presenceCondition;
-    }
-    
-    /**
-     * @return The following block in the same {@link SourceFile}.
-     *      <code>null</code> if this is the last block.
-     */
-    public Block getNext() {
-        return next;
-    }
-    
-    /**
-     * @param next The following block in the same {@link SourceFile}.
-     */
-    public void setNext(Block next) {
-        this.next = next;
     }
     
     /**

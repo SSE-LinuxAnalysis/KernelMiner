@@ -1,6 +1,9 @@
 package de.uni_hildesheim.sse.kernel_miner.code;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 
@@ -15,7 +18,7 @@ public class SourceFile {
     
     private Formula presenceCondition;
     
-    private Block firstBlock;
+    private List<Block> blocks;
     
     /**
      * Creates a new source file.
@@ -24,6 +27,7 @@ public class SourceFile {
      */
     public SourceFile(File path) {
         this.path = path;
+        this.blocks = new ArrayList<>();
     }
     
     /**
@@ -48,18 +52,19 @@ public class SourceFile {
     }
     
     /**
-     * @param firstBlock The first {@link Block} in the file.
+     * Sets the list of blocks found in this file. The previous list is overridden.
+     * 
+     * @param blocks The list of blocks found in this file.
      */
-    public void setFirstBlock(Block firstBlock) {
-        this.firstBlock = firstBlock;
+    public void setBlocks(List<Block> blocks) {
+        this.blocks = new ArrayList<>(blocks);
     }
     
     /**
-     * @param firstBlock The first {@link Block} in the file. Further {@link Block}s are linked
-     *      via {@link Block#getNext()}.
+     * @return The (unmodifiable) list of blocks that are found in this file.
      */
-    public Block getFirstBlock() {
-        return firstBlock;
+    public List<Block> getBlocks() {
+        return Collections.unmodifiableList(blocks);
     }
     
 }
