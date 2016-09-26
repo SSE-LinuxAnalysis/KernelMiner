@@ -3,6 +3,7 @@ package de.uni_hildesheim.sse.kernel_miner.test;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -56,6 +57,7 @@ public class Test {
         Logger.INSTANCE.logInfo("Starting " + NUM_THREADS + " worker threads");
         for (int i = 0; i < NUM_THREADS; i++) {
             Thread th = new Thread(new Worker());
+            th.setUncaughtExceptionHandler(ExceptionHandler.INSTANCE);
             th.start();
         }
     }
@@ -139,6 +141,17 @@ public class Test {
                 }
             }
             threadFinished();
+        }
+        
+    }
+    
+    private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+        public static final ExceptionHandler INSTANCE = new ExceptionHandler();
+        
+        @Override
+        public void uncaughtException(Thread t, Throwable e) {
+            Logger.INSTANCE.logException("Uncaught exception in thread " + t.getName(), e);
         }
         
     }
