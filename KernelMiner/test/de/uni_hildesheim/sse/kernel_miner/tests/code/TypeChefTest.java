@@ -24,31 +24,31 @@ public class TypeChefTest {
     
     private static final File TESTDATA = new File("testdata/TypeChefTest");
     
+    private static TypeChef CHEF;
+    
     @BeforeClass
     public static void initLogger() {
         Logger.init();
     }
     
-    private TypeChef createTypeChef() throws IOException {
-        TypeChef chef = new TypeChef(new File(TESTDATA, "src"), new File(TESTDATA, "models/model"));
+    @BeforeClass
+    public static void createTypeChef() throws IOException {
+        CHEF = new TypeChef(new File(TESTDATA, "src"), new File(TESTDATA, "models/model"));
         
-        chef.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
-        chef.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
-        chef.addSourceIncludeDir(new File("include"));
+        CHEF.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
+        CHEF.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
+        CHEF.addSourceIncludeDir(new File("include"));
         
         File output = File.createTempFile("typechef_output", ".zip", TESTDATA);
         output.delete();
         output.deleteOnExit();
-        chef.setOutput(output);
-        
-        return chef;
+        CHEF.setOutput(output);
     }
 
     @Test
     public void testSimpleFile() throws IOException {
-        TypeChef chef = createTypeChef();
         SourceFile file = new SourceFile(new File("simpleFile.c"));
-        chef.runOnFile(file);
+        CHEF.runOnFile(file);
         
         Iterator<Block> it = file.getBlocks().iterator();
         
@@ -87,9 +87,8 @@ public class TypeChefTest {
     
     @Test
     public void testIncludes() throws IOException {
-        TypeChef chef = createTypeChef();
         SourceFile file = new SourceFile(new File("includingFile.c"));
-        chef.runOnFile(file);
+        CHEF.runOnFile(file);
         
         Iterator<Block> it = file.getBlocks().iterator();
         
