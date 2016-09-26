@@ -44,6 +44,8 @@ public class TypeChef {
     
     private File kconfigModelsDir;
     
+    private File systemRoot;
+    
     private List<File> postIncludeDirs;
     
     private List<File> linuxIncludeDirs;
@@ -66,6 +68,7 @@ public class TypeChef {
         setPartialConfHeader(new File("res/typechef/partial_conf.h"));
         setPlatformHeader(new File("res/typechef/platform.h"));
         setKconfigModelsDir(kconfigModelsDir);
+        setSystemRoot(new File("/"));
         
         postIncludeDirs = new ArrayList<>();
         addDefaultPostIncludeDirs();
@@ -81,7 +84,7 @@ public class TypeChef {
      * 
      * @param exe Path to the TypeChef executable.
      */
-    private void setExe(File exe) {
+    public void setExe(File exe) {
         this.exe = exe;
     }
     
@@ -138,21 +141,33 @@ public class TypeChef {
     }
     
     /**
+     * Sets the system root root directory. System include directories are
+     * interpreted to be relative to this. There should at least be a
+     * <code>usr/include/</code> folder in this system root. Most Linux machines
+     * probably want to use simply <code>/</code> here.
+     * 
+     * @param systemRoot The system root directory, where all system include directories are located.
+     */
+    public void setSystemRoot(File systemRoot) {
+        this.systemRoot = systemRoot;
+    }
+    
+    /**
      * Adds a system include directory, where TypeChef will search for header files.
      * 
-     * @param postIncludeDir The system include directory.
+     * @param postIncludeDir The system include directory, relative to the system root.
      */
     public void addPostIncludeDir(File postIncludeDir) {
         postIncludeDirs.add(postIncludeDir);
     }
     
     /**
-     * Adds the default list of system include directories. This works on an
-     * Ubuntu machine.
+     * Adds the default list of system include directories. This works for the
+     * headers of an Ubuntu machine.
      */
     public void addDefaultPostIncludeDirs() {
-        addPostIncludeDir(new File("/usr/lib/gcc/x86_64-linux-gnu/5/include"));
-        addPostIncludeDir(new File("/usr/include/x86_64-linux-gnu"));
+        addPostIncludeDir(new File("usr/lib/gcc/x86_64-linux-gnu/5/include"));
+        addPostIncludeDir(new File("usr/include/x86_64-linux-gnu"));
     }
     
     /**
@@ -358,8 +373,9 @@ public class TypeChef {
         List<String> command = new ArrayList<>();
         command.add(exe.getAbsolutePath());
         command.add("--platfromHeader=" + platformHeader.getAbsolutePath());
+        command.add("--systemRoot=" + systemRoot.getAbsolutePath());
         for (File postIncludeDir : postIncludeDirs) {
-            command.add("--postIncludes=" + Files.relativize(postIncludeDir, new File("/")));
+            command.add("--postIncludes=" + postIncludeDir.getPath());
         }
         command.add("--lex");
         command.add("--prefixonly=CONFIG_");
@@ -455,6 +471,8 @@ public class TypeChef {
                 Logger.INSTANCE.logError("The typechef instance for " + file.getPath() + " exited with status: " + status);
                 return;
             }
+        } else {
+            Logger.INSTANCE.logInfo("Reusing .pi file for file " + file.getPath());
         }
         
         parseOutput(file);
