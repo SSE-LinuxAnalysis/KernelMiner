@@ -86,11 +86,12 @@ public class TestWindows {
         Logger.INSTANCE.logInfo("Starting on file " + file.getPath());
         try {
             TypeChef chef = new TypeChef(new File(BASE_DIR, "linux-4.4"),
-                    new File(BASE_DIR, "kconfig_models"));
+                    new File(BASE_DIR, "kconfig_models/x86"));
             
-            chef.setExe(new File(BASE_DIR, "typechef.bat"));
+            chef.setExe(new File(BASE_DIR, "TypeChef-0.4.1.jar"));
             chef.setSystemRoot(new File(BASE_DIR, "headers"));
             chef.setOutput(new File(BASE_DIR, "typechef_output.zip"));
+            chef.addDefaultLinuxIncludeDirs("x86");
     
             chef.runOnFile(file);
             

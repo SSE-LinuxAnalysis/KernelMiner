@@ -83,8 +83,9 @@ public class Test {
         Logger.INSTANCE.logInfo("Starting on file " + file.getPath());
         try {
             TypeChef chef = new TypeChef(new File(BASE_DIR, "linux-releases/linux-4.4"),
-                    new File(BASE_DIR, "kconfig_models/linux-4.4"));
-    
+                    new File(BASE_DIR, "kconfig_models/linux-4.4/x86"));
+            chef.addDefaultLinuxIncludeDirs("x86");
+            
             chef.runOnFile(file);
             
             
