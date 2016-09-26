@@ -442,7 +442,7 @@ public class TypeChef {
         
         File piFile = new File(file.getPath().getPath() + ".pi");
         
-        if (!output.containsFile(piFile)) {
+        if (!output.containsFile(piFile) || output.readFile(piFile).length() == 0) {
             File tmpPiOutput = File.createTempFile("typechef", ".tmp.pi", new File("."));
             File tmpPCfile = File.createTempFile("typechef", ".tmp.pc", new File("."));
             File stdOut = File.createTempFile("typechef", ".stdout.pc", new File("."));
