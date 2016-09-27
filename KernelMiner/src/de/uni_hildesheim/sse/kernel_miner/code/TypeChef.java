@@ -448,8 +448,8 @@ public class TypeChef {
         if (!output.containsFile(piFile) || output.readFile(piFile).length() == 0) {
             File tmpPiOutput = File.createTempFile("typechef", ".tmp.pi", new File("."));
             File tmpPCfile = File.createTempFile("typechef", ".tmp.pc", new File("."));
-            File stdOut = File.createTempFile("typechef", ".stdout.pc", new File("."));
-            File stdErr = File.createTempFile("typechef", ".stderr.pc", new File("."));
+            File stdOut = File.createTempFile("typechef", ".stdout", new File("."));
+            File stdErr = File.createTempFile("typechef", ".stderr", new File("."));
             
             int status = runTypeChef(file, tmpPiOutput, tmpPCfile, stdOut, stdErr);
     

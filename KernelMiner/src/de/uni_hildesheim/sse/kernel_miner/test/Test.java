@@ -17,7 +17,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
 public class Test {
 
-    private static final int NUM_THREADS = 4;
+    private static final int NUM_THREADS = 6;
     
     private static final ConcurrentLinkedQueue<SourceFile> files = new ConcurrentLinkedQueue<>();
     
