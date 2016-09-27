@@ -122,6 +122,33 @@ public class TypeChefTest {
         Assert.assertFalse(it.hasNext());
     }
     
+    @Test
+    public void testSimpleFilePresenceCondition() throws IOException {
+        SourceFile file = new SourceFile(new File("simpleFile.c"));
+        file.setPresenceCondition(new Variable("CONFIG_MAX"));
+        
+        CHEF.runOnFile(file);
+        
+        Iterator<Block> it = file.getBlocks().iterator();
+        
+        Assert.assertTrue(it.hasNext());
+        Block block = it.next();
+        Assert.assertTrue(block.getLocation().endsWith("res/typechef/platform.h"));
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertTrue(block.getLocation().endsWith("res/typechef/partial_conf.h"));
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertEquals("simpleFile.c", block.getLocation());
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+
+        Assert.assertFalse(it.hasNext());
+    }
+    
     private static void assertVariable(Formula f, String expectedName) {
         assertTrue(f instanceof Variable);
         assertEquals(expectedName, ((Variable) f).getName());
