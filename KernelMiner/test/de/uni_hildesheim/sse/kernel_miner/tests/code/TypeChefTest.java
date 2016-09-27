@@ -38,6 +38,7 @@ public class TypeChefTest {
         CHEF.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
         CHEF.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
         CHEF.addSourceIncludeDir(new File("include"));
+        CHEF.setWorkingDir(TESTDATA);
         
         File output = File.createTempFile("typechef_output", ".zip", TESTDATA);
         output.delete();

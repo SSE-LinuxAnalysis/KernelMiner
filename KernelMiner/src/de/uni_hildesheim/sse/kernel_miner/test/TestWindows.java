@@ -92,6 +92,7 @@ public class TestWindows {
             chef.setSystemRoot(new File(BASE_DIR, "headers"));
             chef.setOutput(new File(BASE_DIR, "typechef_output.zip"));
             chef.addDefaultLinuxIncludeDirs("x86");
+            chef.setWorkingDir(BASE_DIR);
     
             chef.runOnFile(file);
             

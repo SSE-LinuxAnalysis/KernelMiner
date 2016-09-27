@@ -52,6 +52,8 @@ public class TypeChef {
     
     private ZipArchive output;
     
+    private File workingDir;
+    
     /**
      * Creates a {@link TypeChef} instance with default parameters that
      * should work when running on an Ubuntu machine.
@@ -81,6 +83,8 @@ public class TypeChef {
         sourceIncludeDirs = new ArrayList<>();
         
         output = new ZipArchive(new File("typechef_output_" + sourceDir.getName() + ".zip"));
+        
+        setWorkingDir(new File("."));
     }
     
     /**
@@ -227,6 +231,14 @@ public class TypeChef {
      */
     public ZipArchive getOutput() {
         return output;
+    }
+    
+    /**
+     * @param workingDir The working directory where temporary files are stored
+     *      while running TypeChef.
+     */
+    public void setWorkingDir(File workingDir) {
+        this.workingDir = workingDir;
     }
     
     /**
@@ -446,10 +458,12 @@ public class TypeChef {
         File piFile = new File(file.getPath().getPath() + ".pi");
         
         if (!output.containsFile(piFile) || output.readFile(piFile).length() == 0) {
-            File tmpPiOutput = File.createTempFile("typechef", ".tmp.pi", new File("."));
-            File tmpPCfile = File.createTempFile("typechef", ".tmp.pc", new File("."));
-            File stdOut = File.createTempFile("typechef", ".stdout", new File("."));
-            File stdErr = File.createTempFile("typechef", ".stderr", new File("."));
+            String name = file.getPath().getPath().replace(File.separatorChar, '.') + ".";
+            
+            File tmpPiOutput = File.createTempFile(name, ".pi", workingDir);
+            File tmpPCfile = File.createTempFile(name, ".pc", workingDir);
+            File stdOut = File.createTempFile(name, ".stdout", workingDir);
+            File stdErr = File.createTempFile(name, ".stderr", workingDir);
             
             int status = runTypeChef(file, tmpPiOutput, tmpPCfile, stdOut, stdErr);
     
