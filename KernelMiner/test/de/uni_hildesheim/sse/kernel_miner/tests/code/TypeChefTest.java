@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -44,6 +46,17 @@ public class TypeChefTest {
         output.delete();
         output.deleteOnExit();
         CHEF.setOutput(output);
+    }
+    
+    @After
+    public void removePiFiles() {
+        try {
+            CHEF.getOutput().deleteFile(new File("simpleFile.c.pi"));
+            CHEF.getOutput().deleteFile(new File("includingFile.c.pi"));
+        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test
