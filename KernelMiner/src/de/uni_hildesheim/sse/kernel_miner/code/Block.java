@@ -110,5 +110,27 @@ public class Block {
         
         return false;
     }
+    
+    @Override
+    public String toString() {
+        StringBuffer r = new StringBuffer();
+        
+        r.append("#file ").append(location).append('\n');
+        if (presenceCondition != null) {
+            r.append("#if ").append(presenceCondition.toString()).append('\n');
+        }
+        
+        if (containsCode()) {
+            for (String line : lines) {
+                r.append(line).append('\n');
+            }
+        }
+        
+        if (presenceCondition != null) {
+            r.append("#endif\n");
+        }
+        
+        return r.toString();
+    }
 
 }
