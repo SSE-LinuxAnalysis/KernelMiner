@@ -19,5 +19,13 @@ public abstract class Formula {
      */
     @Override
     public abstract String toString();
-
+    
+    /**
+     * Checks whether two {@link Formula}s are equal. {@link Formula}s are equal,
+     * if they contain the same operators in the same hierarchy with the same
+     * variable names.
+     */
+    @Override
+    public abstract boolean equals(Object obj);
+    
 }

@@ -16,5 +16,10 @@ public final class False extends Formula {
     public String toString() {
         return "0";
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof False;
+    }
 
 }

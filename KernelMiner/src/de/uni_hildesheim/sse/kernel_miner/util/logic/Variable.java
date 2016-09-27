@@ -43,5 +43,14 @@ public final class Variable extends Formula {
     public String toString() {
         return name;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Variable) {
+            Variable other = (Variable) obj;
+            return name.equals(other.name);
+        }
+        return false;
+    }
 
 }

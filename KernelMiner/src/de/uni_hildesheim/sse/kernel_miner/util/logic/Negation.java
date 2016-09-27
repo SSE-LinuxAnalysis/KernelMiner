@@ -34,5 +34,14 @@ public final class Negation extends Formula {
     public String toString() {
         return "!" + formula;
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Negation) {
+            Negation other = (Negation) obj;
+            return formula.equals(other.formula);
+        }
+        return false;
+    }
 
 }

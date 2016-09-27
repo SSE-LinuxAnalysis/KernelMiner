@@ -17,4 +17,9 @@ public final class True extends Formula {
         return "1";
     }
     
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof True;
+    }
+    
 }

@@ -46,5 +46,14 @@ public final class Conjunction extends Formula {
     public String toString() {
         return "(" + left.toString() + " && " + right.toString() + ")";
     }
+    
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Conjunction) {
+            Conjunction other = (Conjunction) obj;
+            return left.equals(other.getLeft()) && right.equals(other.getRight());
+        }
+        return false;
+    }
 
 }
