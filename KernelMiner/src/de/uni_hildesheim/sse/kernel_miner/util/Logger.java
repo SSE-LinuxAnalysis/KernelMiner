@@ -49,21 +49,28 @@ public class Logger {
     
     private Charset charset;
     
+    private long started;
+    
     private Logger(OutputStream target, Charset charset) {
         this.target = target;
         this.charset = charset;
+        this.started = System.currentTimeMillis();
     }
     
     /**
      * Creates a "header" prefix for log lines. The lines contain the specified log
-     * level and the name of the current thread.
+     * level, the name of the current thread and the time.
      * 
      * @param level The log level that will be used.
-     * @return A string in the format "[level] [threadName] "
+     * @return A string in the format "[level] [time] [threadName] "
      */
     private String constructHeader(String level) {
         StringBuffer hdr = new StringBuffer();
-        hdr.append('[').append(level).append("] [").append(Thread.currentThread().getName()).append("] ");
+        long time = System.currentTimeMillis();
+        
+        hdr.append('[').append(level).append("] [")
+                .append((time - started) / 1000).append("] [")
+                .append(Thread.currentThread().getName()).append("] ");
         return hdr.toString();
     }
     

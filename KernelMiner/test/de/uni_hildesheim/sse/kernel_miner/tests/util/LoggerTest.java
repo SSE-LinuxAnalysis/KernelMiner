@@ -1,6 +1,8 @@
 package de.uni_hildesheim.sse.kernel_miner.tests.util;
 
 import java.io.ByteArrayOutputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -198,6 +200,34 @@ public class LoggerTest {
             done = true;
         }
         
+    }
+    
+    @Test
+    public void testTimestamp() throws InterruptedException {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        Logger.init(out);
+        Logger l = Logger.INSTANCE; // just a shortcut
+        
+        l.logInfo("message 1");
+        
+        Thread.sleep(1000);
+        
+        l.logInfo("message 2");
+        
+        String[] lines = out.toString().split("\n");
+        Assert.assertEquals(2, lines.length);
+        
+        Pattern p = Pattern.compile("\\[info\\] \\[(\\d+)\\].*");
+        
+        Matcher m = p.matcher(lines[0]);
+        Assert.assertTrue(m.matches());
+        int t1 = Integer.parseInt(m.group(1));
+        
+        m = p.matcher(lines[1]);
+        Assert.assertTrue(m.matches());
+        int t2 = Integer.parseInt(m.group(1));
+        
+        Assert.assertEquals(1, t2 - t1);
     }
 
 }
