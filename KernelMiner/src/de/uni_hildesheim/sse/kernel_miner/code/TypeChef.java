@@ -419,7 +419,7 @@ public class TypeChef {
             }
             
         }
-        command.add("--featureModelDimacs=" + new File(kconfigModelsBase.getPath() + ".dimacs").getAbsolutePath());
+//        command.add("--featureModelDimacs=" + new File(kconfigModelsBase.getPath() + ".dimacs").getAbsolutePath());
         command.add("--openFeat=" + new File(kconfigModelsBase.getPath() + ".features").getAbsolutePath());
         command.add("--include=" + new File(kconfigModelsBase.getPath() + ".completed.h").getAbsolutePath());
         command.add("--include=" + new File(kconfigModelsBase.getPath() + ".nonbool.h").getAbsolutePath());
