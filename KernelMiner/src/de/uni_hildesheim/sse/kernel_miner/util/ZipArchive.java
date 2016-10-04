@@ -3,6 +3,7 @@ package de.uni_hildesheim.sse.kernel_miner.util;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Writer;
 
 import de.schlichtherle.truezip.file.TFile;
@@ -50,17 +51,30 @@ public class ZipArchive {
      * @throws IOException If reading the file fails.
      */
     public String readFile(File file) throws FileNotFoundException, IOException {
+        InputStream in = getInputStream(file);
+        String content = Files.readStream(in);
+        in.close();
+        
+        return content;
+    }
+    
+    /**
+     * Retrieves an input stream to directly read from a file in the archive.
+     * The stream must be closed by the caller.
+     * 
+     * @param file The path of the file in the archive.
+     * @return An {@link InputStream} for the contents of the file.
+     * 
+     * @throws FileNotFoundException If the archive does not contain the given file.
+     */
+    public InputStream getInputStream(File file) throws FileNotFoundException {
         if (!containsFile(file)) {
             throw new FileNotFoundException("Archive does not contain file " + file);
         }
         
         TFile tfile = new TFile(zipFile, file.getPath());
         
-        TFileInputStream in = new TFileInputStream(tfile);
-        String content = Files.readStream(in);
-        in.close();
-        
-        return content;
+        return new TFileInputStream(tfile);
     }
     
     /**

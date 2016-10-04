@@ -6,7 +6,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
+import java.io.InputStreamReader;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -302,7 +302,7 @@ public class TypeChef {
         
         BufferedReader in;
         try {
-            in = new BufferedReader(new StringReader(output.readFile(piFile)));
+            in = new BufferedReader(new InputStreamReader(output.getInputStream(piFile)));
         } catch (FileNotFoundException e) {
             Logger.INSTANCE.logWarning("TypeChef did not output a .pi file for " + sourceFile.getPath());
             return;
