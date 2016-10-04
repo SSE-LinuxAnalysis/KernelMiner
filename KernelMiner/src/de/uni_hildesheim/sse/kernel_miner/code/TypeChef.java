@@ -329,6 +329,9 @@ public class TypeChef {
                 
             } else if (line.startsWith("#ifdef ")) {
                 String varName = line.substring(7);
+                if (!varName.startsWith("CONFIG_")) {
+                    varName = "CONFIG_" + varName;
+                }
                 Formula pc = new Variable(varName);
                 blocks.add(new Block(pc, currentLocation, lineNumber));
                 
@@ -441,7 +444,7 @@ public class TypeChef {
                 status = chef.waitFor();
                 finished = true;
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logger.INSTANCE.logException("Exception while waiting for process to finish", e);
             }
         }
 
