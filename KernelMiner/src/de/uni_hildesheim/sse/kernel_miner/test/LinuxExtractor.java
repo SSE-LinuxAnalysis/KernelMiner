@@ -20,6 +20,8 @@ public abstract class LinuxExtractor {
     
     private ConcurrentLinkedQueue<SourceFile> parserTodo;
     
+    private int parserWorkerCount = 0;
+    private int typeChefWorkerCount = 0;
     
     private Object numFinishedTypeChefThreadsLock = new Object();
     private int numFinishedTypeChefThreads = 0;
@@ -83,7 +85,6 @@ public abstract class LinuxExtractor {
     
     private class TypeChefWorker implements Runnable {
         
-        private int workerCount = 0;
         
         private void runTypeChef(SourceFile file) {
             Logger.INSTANCE.logInfo("Running TypeChef on file " + file.getPath());
@@ -102,8 +103,8 @@ public abstract class LinuxExtractor {
         public void run() {
             try {
                 synchronized (TypeChefWorker.class) {
-                    workerCount++;
-                    Thread.currentThread().setName("TypeChefWorkerThread " + workerCount);
+                    typeChefWorkerCount++;
+                    Thread.currentThread().setName("TypeChefWorkerThread " + typeChefWorkerCount);
                 }
                 
                 SourceFile file = null;
@@ -134,7 +135,6 @@ public abstract class LinuxExtractor {
     
     private class ParserWorker implements Runnable {
         
-        private int workerCount = 0;
         
         private void parseFile(SourceFile file) {
             Logger.INSTANCE.logInfo("Parsing file " + file.getPath());
@@ -175,8 +175,8 @@ public abstract class LinuxExtractor {
         @Override
         public void run() {
             synchronized (ParserWorker.class) {
-                workerCount++;
-                Thread.currentThread().setName("ParserWorkerThread " + workerCount);
+                parserWorkerCount++;
+                Thread.currentThread().setName("ParserWorkerThread " + parserWorkerCount);
             }
             
             SourceFile file = null;
@@ -186,7 +186,7 @@ public abstract class LinuxExtractor {
                     file = parserTodo.poll();
                     if (file == null) {
                         synchronized (numFinishedTypeChefThreadsLock) {
-                            if (numFinishedTypeChefThreads >= getNumTypeChefThreads()) {
+                            if (numFinishedTypeChefThreads >= typeChefWorkerCount) {
                                 break;
                             }
                         }

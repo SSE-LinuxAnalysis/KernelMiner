@@ -35,12 +35,12 @@ public class TestLinux extends LinuxExtractor {
 
     @Override
     protected int getNumTypeChefThreads() {
-        return 5;
+        return 6;
     }
 
     @Override
     protected int getNumParserThreads() {
-        return 3;
+        return 1;
     }
 
     @Override
