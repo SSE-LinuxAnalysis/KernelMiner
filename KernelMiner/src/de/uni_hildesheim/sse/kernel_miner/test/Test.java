@@ -89,6 +89,7 @@ public class Test {
             chef.addDefaultLinuxIncludeDirs("x86");
             
             chef.runOnFile(file);
+            chef.parseOutput(file);
             
             
             if (!file.getBlocks().isEmpty()) {

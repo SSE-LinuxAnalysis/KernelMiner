@@ -63,6 +63,7 @@ public class TypeChefTest {
     public void testSimpleFile() throws IOException {
         SourceFile file = new SourceFile(new File("simpleFile.c"));
         CHEF.runOnFile(file);
+        CHEF.parseOutput(file);
         
         Iterator<Block> it = file.getBlocks().iterator();
         
@@ -103,6 +104,7 @@ public class TypeChefTest {
     public void testIncludes() throws IOException {
         SourceFile file = new SourceFile(new File("includingFile.c"));
         CHEF.runOnFile(file);
+        CHEF.parseOutput(file);
         
         Iterator<Block> it = file.getBlocks().iterator();
         
@@ -141,6 +143,7 @@ public class TypeChefTest {
         file.setPresenceCondition(new Variable("CONFIG_MAX"));
         
         CHEF.runOnFile(file);
+        CHEF.parseOutput(file);
         
         Iterator<Block> it = file.getBlocks().iterator();
         

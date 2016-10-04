@@ -95,6 +95,7 @@ public class TestWindows {
             chef.setWorkingDir(BASE_DIR);
     
             chef.runOnFile(file);
+            chef.parseOutput(file);
             
             
             if (!file.getBlocks().isEmpty()) {
