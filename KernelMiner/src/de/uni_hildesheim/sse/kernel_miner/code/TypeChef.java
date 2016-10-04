@@ -348,11 +348,6 @@ public class TypeChef {
             } else if (line.startsWith("#endif")) {
                 blocks.add(new Block(new True(), currentLocation, lineNumber));
                 
-            } else if (line.startsWith("#")) {
-                Logger.INSTANCE.logWarning("File " + sourceFile.getPath()
-                        + " contains a preprocessor directive that wasn't understood:",
-                        line);
-                
             } else {
                 if (blocks.isEmpty()) {
                     blocks.add(new Block(new True(), currentLocation, lineNumber));
