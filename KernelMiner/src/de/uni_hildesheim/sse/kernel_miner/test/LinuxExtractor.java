@@ -74,9 +74,9 @@ public abstract class LinuxExtractor {
         }
         
         // for debugging purposes, only selected files can be parsed by the following lines:
-        typeChefTodo.clear();
+//        typeChefTodo.clear();
 //        typeChefTodo.add(new SourceFile(new File("arch/x86/crypto/aes_glue.c")));
-        typeChefTodo.add(new SourceFile(new File("kernel/kallsyms.c")));
+//        typeChefTodo.add(new SourceFile(new File("kernel/kallsyms.c")));
 //        typeChefTodo.add(new SourceFile(new File("arch/x86/kernel/crash.c")));
 //        typeChefTodo.add(new SourceFile(new File("arch/x86/kernel/fpu/regset.c")));
         
