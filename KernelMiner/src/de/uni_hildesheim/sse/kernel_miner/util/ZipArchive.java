@@ -78,6 +78,24 @@ public class ZipArchive {
     }
     
     /**
+     * Returns the (uncompressed) size of the given file in the archive.
+     * 
+     * @param file The path of the file in the archive.
+     * @return The size of the file in bytes.
+     * 
+     * @throws FileNotFoundException If the archive does not contain the given file.
+     */
+    public long getSize(File file) throws FileNotFoundException {
+        if (!containsFile(file)) {
+            throw new FileNotFoundException("Archive does not contain file " + file);
+        }
+        
+        TFile tfile = new TFile(zipFile, file.getPath());
+        
+        return tfile.length();
+    }
+    
+    /**
      * Writes, or overwrites the given file in the archive.
      * 
      * @param file The path of the file in the archive.

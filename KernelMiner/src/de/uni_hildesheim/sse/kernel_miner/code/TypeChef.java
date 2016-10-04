@@ -466,7 +466,8 @@ public class TypeChef {
         
         File piFile = new File(file.getPath().getPath() + ".pi");
         
-        if (!output.containsFile(piFile) || output.readFile(piFile).length() == 0) {
+        if (!output.containsFile(piFile) || output.getSize(piFile) == 0) {
+            
             String name = file.getPath().getPath().replace(File.separatorChar, '.') + ".";
             
             File tmpPiOutput = File.createTempFile(name, ".pi", workingDir);

@@ -67,6 +67,26 @@ public class ZipArchiveTest {
     }
     
     @Test
+    public void testGetSize() throws IOException {
+        File zipFile = new File(testdata, "archive.zip");
+        ZipArchive archive = new ZipArchive(zipFile);
+
+        Assert.assertEquals(13, archive.getSize(new File("test.txt")));
+    }
+    
+    @Test
+    public void testGetSizeNotExisting() throws IOException {
+        File zipFile = new File(testdata, "archive.zip");
+        ZipArchive archive = new ZipArchive(zipFile);
+        
+        try {
+            archive.getSize(new File("doesntExist.txt"));
+            Assert.fail("Expected exception");
+        } catch (FileNotFoundException e) {
+        }
+    }
+    
+    @Test
     public void testWriteAndDeleteFile() throws IOException {
         File zipFile = new File(testdata, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
