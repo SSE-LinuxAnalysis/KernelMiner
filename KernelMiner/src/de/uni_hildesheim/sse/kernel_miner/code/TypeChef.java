@@ -18,6 +18,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
@@ -315,7 +316,7 @@ public class TypeChef {
         while ((line = in.readLine()) != null) {
             lineNumber++;
             
-            if (line.startsWith("#line")) {
+            if (line.startsWith("#line ")) {
                 String[] parts = line.split(" ");
                 currentLocation = parts[2].substring(1, parts[2].length() - 1);
                 currentLocation = Files.relativize(new File(currentLocation), sourceDir);
@@ -326,7 +327,12 @@ public class TypeChef {
                     }
                 }
                 
-            } else if (line.startsWith("#if")) {
+            } else if (line.startsWith("#ifdef ")) {
+                String varName = line.substring(7);
+                Formula pc = new Variable(varName);
+                blocks.add(new Block(pc, currentLocation, lineNumber));
+                
+            } else if (line.startsWith("#if ")) {
                 String pcStr = line.substring(4);
                 
                 Formula pc = new True();
@@ -341,6 +347,11 @@ public class TypeChef {
                 
             } else if (line.startsWith("#endif")) {
                 blocks.add(new Block(new True(), currentLocation, lineNumber));
+                
+            } else if (line.startsWith("#")) {
+                Logger.INSTANCE.logWarning("File " + sourceFile.getPath()
+                        + " contains a preprocessor directive that wasn't understood:",
+                        line);
                 
             } else {
                 if (blocks.isEmpty()) {
