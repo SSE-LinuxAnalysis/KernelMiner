@@ -69,16 +69,6 @@ public class TypeChefTest {
         
         Assert.assertTrue(it.hasNext());
         Block block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/platform.h"));
-        Assert.assertTrue(block.getPresenceCondition() instanceof True);
-        
-        Assert.assertTrue(it.hasNext());
-        block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/partial_conf.h"));
-        Assert.assertTrue(block.getPresenceCondition() instanceof True);
-
-        Assert.assertTrue(it.hasNext());
-        block = it.next();
         Assert.assertEquals("simpleFile.c", block.getLocation());
         Assert.assertTrue(block.getPresenceCondition() instanceof True);
 
@@ -110,17 +100,6 @@ public class TypeChefTest {
         
         Assert.assertTrue(it.hasNext());
         Block block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/platform.h"));
-        Assert.assertTrue(block.getPresenceCondition() instanceof True);
-        
-        Assert.assertTrue(it.hasNext());
-        block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/partial_conf.h"));
-        Assert.assertTrue(block.getPresenceCondition() instanceof True);
-        
-        
-        Assert.assertTrue(it.hasNext());
-        block = it.next();
         Assert.assertTrue(block.getLocation().endsWith("usr/include/someSystemHeader.h"));
         Assert.assertTrue(block.getPresenceCondition() instanceof True);
         
@@ -149,19 +128,41 @@ public class TypeChefTest {
         
         Assert.assertTrue(it.hasNext());
         Block block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/platform.h"));
+        Assert.assertEquals("simpleFile.c", block.getLocation());
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+
+        Assert.assertFalse(it.hasNext());
+    }
+    
+    @Test
+    public void testComments() throws IOException {
+        SourceFile file = new SourceFile(new File("commentFile.c"));
+        
+        CHEF.runOnFile(file);
+        CHEF.parseOutput(file);
+        
+        Iterator<Block> it = file.getBlocks().iterator();
+        
+        Assert.assertTrue(it.hasNext());
+        Block block = it.next();
+        Assert.assertEquals("commentFile.c", block.getLocation());
         Assert.assertTrue(block.getPresenceCondition() instanceof True);
         
         Assert.assertTrue(it.hasNext());
         block = it.next();
-        Assert.assertTrue(block.getLocation().endsWith("res/typechef/partial_conf.h"));
-        Assert.assertTrue(block.getPresenceCondition() instanceof True);
-
+        Assert.assertEquals("commentFile.c", block.getLocation());
+        assertVariable(block.getPresenceCondition(), "CONFIG_MAX");
+        
         Assert.assertTrue(it.hasNext());
         block = it.next();
-        Assert.assertEquals("simpleFile.c", block.getLocation());
+        Assert.assertEquals("commentFile.c", block.getLocation());
         Assert.assertTrue(block.getPresenceCondition() instanceof True);
-
+        
+        Assert.assertTrue(it.hasNext());
+        block = it.next();
+        Assert.assertEquals("commentFile.c", block.getLocation());
+        Assert.assertTrue(block.getPresenceCondition() instanceof True);
+        
         Assert.assertFalse(it.hasNext());
     }
     

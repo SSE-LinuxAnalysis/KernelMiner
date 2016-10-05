@@ -71,39 +71,17 @@ public class Block {
     }
     
     /**
-     * Heuristically checks whether there is actual code inside this block.
+     * Checks whether there is actual code inside this block.
      * This is done by checking whether there are any non-empty lines inside this block.
-     * Comments are considered, too.
      * 
      * @return <code>true</code> if this block contains non-empty lines.
      */
     public boolean containsCode() {
-        boolean inBlockComment = false;
-        
         for (String line : lines) {
-            if (line.length() > 0) {
-                char[] chars = line.toCharArray();
-                for (int i = 0; i < chars.length; i++) {
-                    if (!inBlockComment && i < chars.length - 1 && chars[i] == '/' && chars[i + 1] == '*') {
-                        inBlockComment = true;
-                        i++;
-                        continue;
-                    }
-                    
-                    if (inBlockComment && i < chars.length - 1 && chars[i] == '*' && chars[i + 1] == '/') {
-                        inBlockComment = false;
-                        i++;
-                        continue;
-                    }
-                    
-                    if (!inBlockComment && i < chars.length - 1 && chars[i] == '/' && chars[i + 1] == '/') {
-                        i++;
-                        break;
-                    }
-                    
-                    if (!inBlockComment && !Character.isWhitespace(chars[i])) {
-                        return true;
-                    }
+            char[] chars = line.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (!Character.isWhitespace(chars[i])) {
+                    return true;
                 }
             }
         }

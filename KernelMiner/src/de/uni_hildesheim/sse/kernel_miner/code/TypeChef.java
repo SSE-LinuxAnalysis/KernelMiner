@@ -1,27 +1,17 @@
 package de.uni_hildesheim.sse.kernel_miner.code;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.InputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
-import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
-import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
-import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
-import de.uni_hildesheim.sse.kernel_miner.util.parser.Parser;
-import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,
@@ -31,10 +21,6 @@ import de.uni_hildesheim.sse.kernel_miner.util.parser.VariableCache;
  */
 public class TypeChef {
 
-    private static final VariableCache PC_CACHE = new VariableCache();
-    
-    private static final Parser<Formula> PC_PARSER = new Parser<>(new TypeChefPresenceConditionGrammar(PC_CACHE));
-    
     private File exe;
     
     private File sourceDir;
@@ -300,76 +286,19 @@ public class TypeChef {
     public void parseOutput(SourceFile sourceFile) throws IOException {
         File piFile = new File(sourceFile.getPath().getPath() + ".pi");
         
-        BufferedReader in;
+        InputStream in;
         try {
-            in = new BufferedReader(new InputStreamReader(output.getInputStream(piFile)));
+            in = output.getInputStream(piFile);
         } catch (FileNotFoundException e) {
             Logger.INSTANCE.logWarning("TypeChef did not output a .pi file for " + sourceFile.getPath());
             return;
         }
         
-        List<Block> blocks = new LinkedList<>();
-        String currentLocation = sourceFile.getPath().getPath();
-        
-        String line;
-        int lineNumber = 0;
-        while ((line = in.readLine()) != null) {
-            lineNumber++;
-            
-            if (line.startsWith("#line ")) {
-                String[] parts = line.split(" ");
-                currentLocation = parts[2].substring(1, parts[2].length() - 1);
-                currentLocation = Files.relativize(new File(currentLocation), sourceDir);
-                if (!blocks.isEmpty()) {
-                    Block lastBlock = blocks.get(blocks.size() - 1);
-                    if (!currentLocation.equals(lastBlock.getLocation())) {
-                        blocks.add(new Block(new True(), currentLocation, lineNumber));
-                    }
-                }
-                
-            } else if (line.startsWith("#ifdef ")) {
-                String varName = line.substring(7);
-                if (!varName.startsWith("CONFIG_")) {
-                    varName = "CONFIG_" + varName;
-                }
-                Formula pc = new Variable(varName);
-                blocks.add(new Block(pc, currentLocation, lineNumber));
-                
-            } else if (line.startsWith("#if ")) {
-                String pcStr = line.substring(4);
-                
-                Formula pc = new True();
-                try {
-                    pc = PC_PARSER.parse(pcStr);
-                } catch (ExpressionFormatException e) {
-                    Logger.INSTANCE.logException("Can't parse presence condition " + pcStr, e);
-                }
-                PC_CACHE.clear();
-                
-                blocks.add(new Block(pc, currentLocation, lineNumber));
-                
-            } else if (line.startsWith("#endif")) {
-                blocks.add(new Block(new True(), currentLocation, lineNumber));
-                
-            } else {
-                if (blocks.isEmpty()) {
-                    blocks.add(new Block(new True(), currentLocation, lineNumber));
-                }
-                blocks.get(blocks.size() - 1).addLine(line);
-            }
-        }
+        TypeChefParser parser = new TypeChefParser(sourceFile, sourceDir);
+        parser.parseFile(in);
         
         in.close();
         
-        // remove empty blocks, i.e. blocks generated between #endif and #if with nothing in between
-        for (Iterator<Block> it = blocks.iterator(); it.hasNext();) {
-               Block block = it.next();
-               if (block.getLines().isEmpty()) {
-                   it.remove();
-               }
-        }
-        
-        sourceFile.setBlocks(blocks);
     }
     
     /**
