@@ -55,7 +55,9 @@ class TypeChefParser {
     
     /**
      * Parses the given .pi file. The {@link SourceFile} will have the {@link Block}s
-     * added to it afterwards.
+     * added to it afterwards. This should be only called once for each object.
+     * When multiple .pi files should be parsed then create multiple
+     * {@link TypeChefParser} objects.
      * 
      * @param in The stream that reads the content of the .pi file.
      * 

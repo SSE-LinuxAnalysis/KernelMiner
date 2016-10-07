@@ -40,7 +40,7 @@ public class TestLinux extends LinuxExtractor {
 
     @Override
     protected int getNumParserThreads() {
-        return 1;
+        return 2;
     }
 
     @Override
