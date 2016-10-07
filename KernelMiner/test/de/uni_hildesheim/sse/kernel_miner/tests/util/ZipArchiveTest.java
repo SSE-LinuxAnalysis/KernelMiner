@@ -44,6 +44,15 @@ public class ZipArchiveTest {
     }
     
     @Test
+    public void testContainsFileOnDirectory() {
+        File zipFile = new File(testdata, "archive.zip");
+        ZipArchive archive = new ZipArchive(zipFile);
+        
+        Assert.assertFalse(archive.containsFile(new File("dir")));
+        Assert.assertFalse(archive.containsFile(new File("dir/")));
+    }
+    
+    @Test
     public void testReadFile() throws FileNotFoundException, IOException {
         File zipFile = new File(testdata, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);

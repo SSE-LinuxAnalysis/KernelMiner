@@ -38,7 +38,7 @@ public class ZipArchive {
      */
     public boolean containsFile(File file) {
         TFile tfile = new TFile(zipFile, file.getPath());
-        return tfile.exists();
+        return tfile.exists() && tfile.isFile();
     }
     
     /**
