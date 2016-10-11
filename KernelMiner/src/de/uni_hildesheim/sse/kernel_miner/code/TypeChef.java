@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
@@ -370,7 +371,18 @@ public class TypeChef {
         boolean finished = false;
         while (!finished) {
             try {
-                status = chef.waitFor();
+                if (chef.waitFor(2, TimeUnit.HOURS)) {
+                    // subprocess exited
+                    status = chef.exitValue();
+                } else {
+                    // timeout reached
+                    Logger.INSTANCE.logError("Timeout reached while waiting for TypeChef to finish");
+                    chef.destroyForcibly();
+                    chef.waitFor();
+                    piOutput.delete();
+                    status = -42;
+                }
+                
                 finished = true;
             } catch (InterruptedException e) {
                 Logger.INSTANCE.logException("Exception while waiting for process to finish", e);
