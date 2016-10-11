@@ -14,7 +14,13 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
-public abstract class TypeChefLinuxExtractor {
+/**
+ * This class runs TypeChef on a list of source files and parses the output.
+ * This is done using several threads to gain maximum performance.
+ * 
+ * @author Adam Krafczyk
+ */
+public abstract class TypeChefExtractor {
     
     private ConcurrentLinkedQueue<SourceFile> typeChefTodo;
     
@@ -28,9 +34,16 @@ public abstract class TypeChefLinuxExtractor {
     
     private TypeChef typeChef;
     
-    public TypeChefLinuxExtractor() {
+    public TypeChefExtractor() {
     }
     
+    /**
+     * Starts running TypeChef on the files and parsing their output.
+     * This spawns several threads that do the work. This method returns
+     * directly after spawning the threads, it does not wait for them to finish their work.
+     * <br /><br />
+     * The {@link Logger} class should be initialized before calling this.
+     */
     public void start()  {
         typeChefTodo = new ConcurrentLinkedQueue<>();
         parserTodo = new ConcurrentLinkedQueue<>();
@@ -54,12 +67,29 @@ public abstract class TypeChefLinuxExtractor {
         }
     }
     
+    /**
+     * Creates a {@link TypeChef} instance. This method will only be called once,
+     * and the {@link TypeChef} instance will be reused for all files.
+     * 
+     * @return The TypeChef instance that will be used to run TypeChef on the source files.
+     */
     protected abstract TypeChef createTypeChef();
     
+    /**
+     * @return How many threads should run {@link TypeChef} in parallel.
+     */
     protected abstract int getNumTypeChefThreads();
     
+    /**
+     * @return How many threads should run parsers for the TypeChef output in parallel.
+     */
     protected abstract int getNumParserThreads();
     
+    /**
+     * @return The file that contains the list of all source files to parse with their presence condition.
+     * This will be read by {@link KbuildMiner#readOutput(File)}. This file is usually
+     * created by KbuildMiner.
+     */
     protected abstract File getPcFile();
 
     private void readFileNames(File pcFile) {

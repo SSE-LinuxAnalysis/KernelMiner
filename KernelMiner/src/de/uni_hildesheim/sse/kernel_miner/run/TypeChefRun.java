@@ -10,11 +10,24 @@ import java.util.Properties;
 import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 
-public class TypeChefLinuxRun extends TypeChefLinuxExtractor {
+/**
+ * This class initiates running TypeChef to extract variability information
+ * from a complete source code tree. The main Method can be called as an
+ * entry point for this application.
+ * 
+ * @author Adam Krafczyk
+ */
+public class TypeChefRun extends TypeChefExtractor {
 
     private Properties config;
     
-    public TypeChefLinuxRun(String configFile) throws IOException {
+    /**
+     * Creates a {@link TypeChefRun} with the given configuration.
+     * 
+     * @param configFile The path to the configuration file. See doc/kernelminer.properties
+     * @throws IOException If reading the configuration file or initializing the {@link Logger} fails.
+     */
+    public TypeChefRun(String configFile) throws IOException {
         config = new Properties();
         try {
             config.load(new FileInputStream(new File(configFile)));
@@ -83,12 +96,19 @@ public class TypeChefLinuxRun extends TypeChefLinuxExtractor {
         return new File(config.getProperty("typechef.pcFile"));
     }
     
+    /**
+     * Starts the application that runs TypeChef.
+     * 
+     * @param args <code>args[0]</code> Specifies the path to the configuration file.
+     *      If not specified, then "kernelminer.properties" is used.
+     * @throws IOException If reading the configuration file or initializing the {@link Logger} fails.
+     */
     public static void main(String[] args) throws IOException {
         String configFile = "kernelminer.properties";
         if (args.length > 0) {
             configFile = args[0];
         }
-        new TypeChefLinuxRun(configFile).start();
+        new TypeChefRun(configFile).start();
     }
 
 }
