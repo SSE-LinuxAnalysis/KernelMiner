@@ -14,7 +14,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
-public abstract class LinuxExtractor {
+public abstract class TypeChefLinuxExtractor {
     
     private ConcurrentLinkedQueue<SourceFile> typeChefTodo;
     
@@ -28,16 +28,15 @@ public abstract class LinuxExtractor {
     
     private TypeChef typeChef;
     
-    public LinuxExtractor() {
-        typeChefTodo = new ConcurrentLinkedQueue<>();
-        parserTodo = new ConcurrentLinkedQueue<>();
-        
-        typeChef = createTypeChef();
-        
-        readFileNames(getPcFile());
+    public TypeChefLinuxExtractor() {
     }
     
     public void start()  {
+        typeChefTodo = new ConcurrentLinkedQueue<>();
+        parserTodo = new ConcurrentLinkedQueue<>();
+        typeChef = createTypeChef();
+        readFileNames(getPcFile());
+        
         int numChefThreads = getNumTypeChefThreads();
         Logger.INSTANCE.logInfo("Starting " + numChefThreads + " TypeChefWorkerThreads");
         for (int i = 0; i < numChefThreads; i++) {

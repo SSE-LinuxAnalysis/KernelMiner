@@ -35,12 +35,17 @@ public class TypeChefTest {
     
     @BeforeClass
     public static void createTypeChef() throws IOException {
-        CHEF = new TypeChef(new File(TESTDATA, "src"), new File(TESTDATA, "models/model"));
+        CHEF = new TypeChef();
         
+        CHEF.setSourceDir(new File(TESTDATA, "src"));
+        CHEF.setKconfigModelsBase(new File(TESTDATA, "models/model"));
         CHEF.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
+        CHEF.addDefaultPostIncludeDirs();
         CHEF.setExe(new File(TESTDATA, "res/TypeChef-0.4.1.jar"));
         CHEF.addSourceIncludeDir(new File("include"));
         CHEF.setWorkingDir(TESTDATA);
+        CHEF.setPartialConfHeader(new File("res/typechef/partial_conf.h"));
+        CHEF.setPlatformHeader(new File("res/typechef/platform.h"));
         
         File output = File.createTempFile("typechef_output", ".zip", TESTDATA);
         output.delete();
