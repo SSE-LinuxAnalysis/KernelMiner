@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
@@ -360,26 +359,33 @@ public class TypeChef {
         builder.redirectError(Redirect.to(stdErr));
         
         Process chef = builder.start();
+        long started = System.currentTimeMillis();
         
         int status = -1;
         boolean finished = false;
         while (!finished) {
+            // poll every 100 ms
             try {
-                if (chef.waitFor(2, TimeUnit.HOURS)) {
-                    // subprocess exited
-                    status = chef.exitValue();
-                } else {
-                    // timeout reached
-                    Logger.INSTANCE.logError("Timeout reached while waiting for TypeChef to finish");
-                    chef.destroyForcibly();
-                    chef.waitFor();
-                    piOutput.delete();
-                    status = -42;
-                }
-                
-                finished = true;
+                Thread.sleep(100);
             } catch (InterruptedException e) {
-                Logger.INSTANCE.logException("Exception while waiting for process to finish", e);
+            }
+            
+            try {
+                status = chef.exitValue();
+                finished = true;
+                
+            } catch (IllegalThreadStateException e) {
+                // process is not yet finished
+                
+                long current = System.currentTimeMillis();
+                // if we are running longer than 2 hours (= 2h * 60 min/h * 60 s/min * 1000 ms/s)
+                if (current - started > 2L * 60L * 60L * 1000L) {
+                    Logger.INSTANCE.logError("Timeout reached while waiting for TypeChef to finish");
+                    chef.destroy();
+                    status = -42;
+                    piOutput.delete();
+                    finished = true;
+                }
             }
         }
 
