@@ -31,6 +31,24 @@ public class ZipArchiveTest {
     }
     
     @Test
+    public void testInvalidCreation() throws IOException {
+        File zipFile = new File(testdata, "testInvalidCreation.notzip");
+        zipFile.deleteOnExit();
+        if (zipFile.exists()) {
+            zipFile.delete();
+        }
+        Assert.assertFalse(zipFile.exists());
+        
+        try {
+            new ZipArchive(zipFile);
+            Assert.fail("Expected exception");
+        } catch (IllegalArgumentException e) {
+        }
+        
+        Assert.assertFalse(zipFile.exists());
+    }
+    
+    @Test
     public void testContainsFile() {
         File zipFile = new File(testdata, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);

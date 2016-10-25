@@ -25,9 +25,15 @@ public class ZipArchive {
      * on the first {@link #writeFile(File, String)} call. Until then, it is
      * treated like an empty archive.
      * 
-     * @param location The location of the archive file.
+     * @param location The location of the archive file. This must end with ".zip"
+     * 
+     * @throws IllegalArgumentException If the location does not end with ".zip"
      */
-    public ZipArchive(File location) {
+    public ZipArchive(File location) throws IllegalArgumentException {
+        if (!location.getName().endsWith(".zip")) {
+            throw new IllegalArgumentException("Invalid archive name: " + location);
+        }
+        
         zipFile = new TFile(location);
     }
     
