@@ -22,8 +22,7 @@ public class ZipArchive {
     
     /**
      * Opens a zip archive. If the archive does not exist, then it is created
-     * on the first {@link #writeFile(File, String)} call. Until then, it is
-     * treated like an empty archive.
+     * when the first file is written. Until then, it is treated like an empty archive.
      * 
      * @param location The location of the archive file. This must end with ".zip"
      * 
