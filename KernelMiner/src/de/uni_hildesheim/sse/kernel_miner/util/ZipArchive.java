@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Writer;
+import java.io.OutputStream;
+import java.nio.charset.Charset;
 
 import de.schlichtherle.truezip.file.TFile;
 import de.schlichtherle.truezip.file.TFileInputStream;
-import de.schlichtherle.truezip.file.TFileWriter;
+import de.schlichtherle.truezip.file.TFileOutputStream;
 
 /**
  * Wrapper for accessing files inside a zip archive.
@@ -96,6 +97,21 @@ public class ZipArchive {
     }
     
     /**
+     * Retrieves an {@link OutputStream} to write (or overwrite) the specified
+     * file in the archive. The caller must close the stream.
+     * 
+     * @param file The path of the file in the archive.
+     * @return A stream to write to the specified file.
+     * 
+     * @throws IOException If creating the stream fails.
+     */
+    public OutputStream getOutputStream(File file) throws IOException {
+        TFile tfile = new TFile(zipFile, file.getPath());
+        
+        return new TFileOutputStream(tfile);
+    }
+    
+    /**
      * Writes, or overwrites the given file in the archive.
      * 
      * @param file The path of the file in the archive.
@@ -104,10 +120,8 @@ public class ZipArchive {
      * @throws IOException If writing the file fails.
      */
     public void writeFile(File file, String content) throws IOException {
-        TFile tfile = new TFile(zipFile, file.getPath());
-        
-        Writer out = new TFileWriter(tfile);
-        out.write(content);
+        OutputStream out = getOutputStream(file);
+        out.write(content.getBytes(Charset.forName("UTF-8")));
         out.close();
     }
     
