@@ -165,8 +165,8 @@ class TypeChefParser {
         } else if (line.startsWith("#endif")) {
             addBlock(new True());
             
-        } else if (line.startsWith("#error")) {
-            // ignore error statements
+        } else if (line.startsWith("#error") || line.startsWith("#warning")) {
+            // ignore error and warning statements
             
         } else if (line.startsWith("#")) {
             Logger.INSTANCE.logError("Found unkown preprocessor directive in file " + sourceFile.getPath() + ":",
