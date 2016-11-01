@@ -328,6 +328,7 @@ public class TypeChef {
         command.add("--prefixonly=CONFIG_");
         command.add("--output=" + piOutput.getAbsolutePath().substring(0, piOutput.getAbsolutePath().length() - 3));
         command.add("--writePI");
+        command.add("--xtc"); // TODO
         command.add("--no-analysis");
         if (file.getPresenceCondition() != null) {
             try {
