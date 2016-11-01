@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Properties;
+import java.util.Set;
 
 import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
@@ -94,6 +96,18 @@ public class TypeChefRun extends TypeChefExtractor {
     @Override
     protected File getPcFile() {
         return new File(config.getProperty("typechef.pcFile"));
+    }
+    
+    @Override
+    protected Set<File> getAllowedFiles() {
+        Set<File> files = new HashSet<>();
+        int i = 0;
+        while (config.getProperty("typechef.files." + i) != null) {
+            files.add(new File(config.getProperty("typechef.files." + i)));
+            i++;
+        }
+        
+        return files;
     }
     
     /**

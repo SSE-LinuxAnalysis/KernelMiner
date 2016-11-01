@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.uni_hildesheim.sse.kernel_miner.code.Block;
@@ -86,6 +87,13 @@ public abstract class TypeChefExtractor {
     protected abstract int getNumParserThreads();
     
     /**
+     * If the returned set is non-empty, then only these files are analyzed.
+     * 
+     * @return The set of filenames, relative to the Linux kernel source tree.
+     */
+    protected abstract Set<File> getAllowedFiles();
+    
+    /**
      * @return The file that contains the list of all source files to parse with their presence condition.
      * This will be read by {@link KbuildMiner#readOutput(File)}. This file is usually
      * created by KbuildMiner.
@@ -94,20 +102,24 @@ public abstract class TypeChefExtractor {
 
     private void readFileNames(File pcFile) {
         Logger.INSTANCE.logInfo("Reading file names from " + pcFile.getAbsolutePath());
+        List<SourceFile> read = null;
         try {
-            List<SourceFile> read = KbuildMiner.readOutput(pcFile); 
-            typeChefTodo.addAll(read);
+            read = KbuildMiner.readOutput(pcFile); 
         } catch (IOException e) {
             Logger.INSTANCE.logException("Can't read pc file", e);
             System.exit(-1);
         }
         
-        // for debugging purposes, only selected files can be parsed by the following lines:
-//        typeChefTodo.clear();
-//        typeChefTodo.add(new SourceFile(new File("arch/x86/crypto/aes_glue.c")));
-//        typeChefTodo.add(new SourceFile(new File("kernel/kallsyms.c")));
-//        typeChefTodo.add(new SourceFile(new File("arch/x86/kernel/crash.c")));
-//        typeChefTodo.add(new SourceFile(new File("arch/x86/kernel/fpu/regset.c")));
+        Set<File> allowedFilenames = getAllowedFiles();
+        if (allowedFilenames.isEmpty()) {
+            typeChefTodo.addAll(read);
+        } else {
+            for (SourceFile sourceFile : read) {
+                if (allowedFilenames.contains(sourceFile.getPath())) {
+                    typeChefTodo.add(sourceFile);
+                }
+            }
+        }
         
         Logger.INSTANCE.logInfo("Read " + typeChefTodo.size() + " file locations");
     }
