@@ -6,12 +6,21 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.ProcessBuilder.Redirect;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
+import de.fosd.typechef.LexerToken;
+import de.fosd.typechef.conditional.Conditional;
+import de.fosd.typechef.featureexpr.FeatureExpr;
+import de.fosd.typechef.lexer.LexerException;
+import de.fosd.typechef.lexer.LexerFrontend;
+import de.fosd.typechef.lexer.LexerFrontend.LexerResult;
+import de.fosd.typechef.lexer.LexerFrontend.LexerSuccess;
+import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
+import scala.Tuple2;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,
@@ -310,25 +319,33 @@ public class TypeChef {
      * @throws IOException If running the process fails.
      * @throws IllegalArgumentException If any of the parameters of the current configuration is not set correctly.
      */
+    @SuppressWarnings("deprecation")
     private int runTypeChef(SourceFile file, File piOutput, File pcFile, File stdOut, File stdErr) throws IOException, IllegalArgumentException {
-        List<String> command = new ArrayList<>();
-        if (exe.getName().endsWith(".jar")) {
-            command.add("java");
-            command.add("-jar");
-            command.add(exe.getAbsolutePath());
-        } else {
-            command.add(exe.getAbsolutePath());
-        }
+        final List<String> command = new ArrayList<>();
+//        if (exe.getName().endsWith(".jar")) {
+//            command.add("java");
+//            command.add("-jar");
+//            command.add(exe.getAbsolutePath());
+//        } else {
+//            command.add(exe.getAbsolutePath());
+//        }
         command.add("--platfromHeader=" + platformHeader.getAbsolutePath());
         command.add("--systemRoot=" + systemRoot.getAbsolutePath());
         for (File postIncludeDir : postIncludeDirs) {
             command.add("--postIncludes=" + postIncludeDir.getPath());
         }
         command.add("--lex");
+        command.add("--lexNoStdout"); // TODO
         command.add("--prefixonly=CONFIG_");
-        command.add("--output=" + piOutput.getAbsolutePath().substring(0, piOutput.getAbsolutePath().length() - 3));
-        command.add("--writePI");
-        command.add("--xtc"); // TODO
+//        command.add("--output=" + piOutput.getAbsolutePath().substring(0, piOutput.getAbsolutePath().length() - 3));
+//        command.add("--writePI");
+        command.add("--output=test");
+        command.add("--lexOutput=" + piOutput.getAbsolutePath());
+        
+//        command.add("--xtc"); // TODO
+//        command.add("--parse");
+//        command.add("--parserstatistics");
+        
         command.add("--no-analysis");
         if (file.getPresenceCondition() != null) {
             try {
@@ -353,44 +370,114 @@ public class TypeChef {
         }
         command.add(new File(sourceDir, file.getPath().getPath()).getAbsolutePath());
         
+        Logger.INSTANCE.logInfo("Running typechef:");
+        Logger.INSTANCE.logInfo(command.toArray(new String[0]));
         
-        ProcessBuilder builder = new ProcessBuilder(command);
+        class Status {
+            int status = -1;
+        };
+        final Status status = new Status();
         
-        builder.redirectOutput(Redirect.to(stdOut));
-        builder.redirectError(Redirect.to(stdErr));
-        
-        Process chef = builder.start();
-        long started = System.currentTimeMillis();
-        
-        int status = -1;
-        boolean finished = false;
-        while (!finished) {
-            // poll every 100 ms
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-            }
+        Thread chef = new Thread() {
             
-            try {
-                status = chef.exitValue();
-                finished = true;
+            public void run() {
+//                Frontend.main(command.toArray(new String[0]));
+                FrontendOptionsWithConfigFiles conf = new FrontendOptionsWithConfigFiles();
                 
-            } catch (IllegalThreadStateException e) {
-                // process is not yet finished
+                conf.parseOptions(command.toArray(new String[0]));
                 
-                long current = System.currentTimeMillis();
-                // if we are running longer than 2 hours (= 2h * 60 min/h * 60 s/min * 1000 ms/s)
-                if (current - started > 2L * 60L * 60L * 1000L) {
-                    Logger.INSTANCE.logError("Timeout reached while waiting for TypeChef to finish");
-                    chef.destroy();
-                    status = -42;
-                    piOutput.delete();
-                    finished = true;
+                LexerFrontend lexer = new LexerFrontend();
+                try {
+                    Conditional<LexerResult> result = lexer.run(conf, true);
+                    scala.collection.immutable.List<Tuple2<FeatureExpr, LexerResult>> list = result.toList();
+                    
+                    Logger.INSTANCE.logWarning("Lexer result size: " + list.size());
+                    
+                    List<String> nonSuccessResults = new LinkedList<>();
+                    nonSuccessResults.add("Lexer errors:");
+                    
+                    for (int i = 0; i < list.size(); i++) {
+                        Tuple2<FeatureExpr, LexerResult> t = list.apply(i);
+                        if (t._2 instanceof LexerSuccess) {
+                            List<LexerToken> tokens = ((LexerSuccess) t._2).getTokens();
+                            Logger.INSTANCE.logInfo("Got " + tokens.size() + " tokens");
+                            status.status = 0;
+                        } else {
+                            nonSuccessResults.add(t._2.toString());
+                        }
+                    }
+                    
+                    if (nonSuccessResults.size() > 1) {
+                        Logger.INSTANCE.logInfo(nonSuccessResults.toArray(new String[0]));
+                    }
+                    
+                    if (status.status != 0) {
+                        Logger.INSTANCE.logError("Lexer was not successful");
+                    }
+                    
+                } catch (IOException | LexerException e) {
+                    Logger.INSTANCE.logException("Exception while lexing", e);
+                    e.printStackTrace();
                 }
             }
+            
+        };
+        
+        chef.setName("TypeChefInstance of " + Thread.currentThread().getName());
+        
+//        System.setOut(new PrintStream(new FileOutputStream(stdOut)));
+//        System.setErr(new PrintStream(new FileOutputStream(stdErr)));
+        
+        chef.start();
+        //  2 hours (= 2h * 60 min/h * 60 s/min * 1000 ms/s)
+        try {
+            chef.join(2L * 60L * 60L * 1000L);
+        } catch (InterruptedException e) {
+            Logger.INSTANCE.logException("Exception while waiting for TypeChef to finish", e);
         }
+        
+        if (chef.isAlive()) {
+            status.status = -1;
+            chef.destroy();
+        }
+        
+//        ProcessBuilder builder = new ProcessBuilder(command);
+//        
+//        builder.redirectOutput(Redirect.to(stdOut));
+//        builder.redirectError(Redirect.to(stdErr));
+//        
+//        Process chef = builder.start();
+//        long started = System.currentTimeMillis();
+//        
+//        int status = -1;
+//        boolean finished = false;
+//        while (!finished) {
+//            // poll every 100 ms
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException e) {
+//            }
+//            
+//            try {
+//                status = chef.exitValue();
+//                finished = true;
+//                
+//            } catch (IllegalThreadStateException e) {
+//                // process is not yet finished
+//                
+//                long current = System.currentTimeMillis();
+//                // if we are running longer than 2 hours (= 2h * 60 min/h * 60 s/min * 1000 ms/s)
+//                if (current - started > 2L * 60L * 60L * 1000L) {
+//                    Logger.INSTANCE.logError("Timeout reached while waiting for TypeChef to finish");
+//                    chef.destroy();
+//                    status = -42;
+//                    piOutput.delete();
+//                    finished = true;
+//                }
+//            }
+//        }
 
-        return status;
+        return status.status;
     }
     
     /**

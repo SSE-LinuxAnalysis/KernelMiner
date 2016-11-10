@@ -171,6 +171,19 @@ public class TypeChefTest {
         Assert.assertFalse(it.hasNext());
     }
     
+    // TODO
+    @Test
+    public void tmpTest() throws IOException {
+        SourceFile file = new SourceFile(new File("multilinePreprocessor.c"));
+        
+        CHEF.runOnFile(file);
+        CHEF.parseOutput(file);
+        
+        for (Block block : file.getBlocks()) {
+            System.out.println(block);
+        }
+    }
+    
     private static void assertVariable(Formula f, String expectedName) {
         assertTrue(f instanceof Variable);
         assertEquals(expectedName, ((Variable) f).getName());
