@@ -7,6 +7,8 @@ package de.uni_hildesheim.sse.kernel_miner.util.logic;
  */
 public final class Disjunction extends Formula {
 
+    private static final long serialVersionUID = 8416793994383200822L;
+
     private Formula left;
     
     private Formula right;

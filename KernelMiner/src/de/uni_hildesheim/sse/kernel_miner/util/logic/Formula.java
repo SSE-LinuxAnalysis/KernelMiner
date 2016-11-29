@@ -1,12 +1,16 @@
 package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
+import java.io.Serializable;
+
 /**
  * A boolean formula.
  * 
  * @author Adam Krafczyk
  */
-public abstract class Formula {
+public abstract class Formula implements Serializable {
     
+    private static final long serialVersionUID = -2811872324947850301L;
+
     /**
      * Evaluates this formula, based on the values set for the {@link Variable}s in this formula.
      * 

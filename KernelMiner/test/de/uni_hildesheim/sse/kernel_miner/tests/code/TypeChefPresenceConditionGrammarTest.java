@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.uni_hildesheim.sse.kernel_miner.code.TypeChefPresenceConditionGrammar;
+import de.uni_hildesheim.sse.kernel_miner.code.typechef.TypeChefPresenceConditionGrammar;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Conjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Disjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;

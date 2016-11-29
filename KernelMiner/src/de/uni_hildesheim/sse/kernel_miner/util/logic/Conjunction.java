@@ -8,6 +8,8 @@ package de.uni_hildesheim.sse.kernel_miner.util.logic;
  */
 public final class Conjunction extends Formula {
 
+    private static final long serialVersionUID = 8595985320940207982L;
+
     private Formula left;
     
     private Formula right;

@@ -9,7 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import de.uni_hildesheim.sse.kernel_miner.code.Block;
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
-import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
+import de.uni_hildesheim.sse.kernel_miner.code.typechef.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildMiner;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
@@ -111,11 +111,10 @@ public abstract class TypeChefExtractor {
         }
         
         Set<File> allowedFilenames = getAllowedFiles();
-        if (allowedFilenames.isEmpty()) {
-            typeChefTodo.addAll(read);
-        } else {
-            for (SourceFile sourceFile : read) {
-                if (allowedFilenames.contains(sourceFile.getPath())) {
+        for (SourceFile sourceFile : read) {
+            // filter assembler files
+            if (!sourceFile.getPath().toString().endsWith(".s") && !sourceFile.getPath().toString().endsWith(".S")) {
+                if (allowedFilenames.isEmpty() || allowedFilenames.contains(sourceFile.getPath())) {
                     typeChefTodo.add(sourceFile);
                 }
             }
@@ -180,7 +179,7 @@ public abstract class TypeChefExtractor {
         private void parseFile(SourceFile file) {
             Logger.INSTANCE.logInfo("Parsing file " + file.getPath());
             try {
-                typeChef.parseOutput(file);
+                typeChef.parseTokens(file);
                 
                 if (!file.getBlocks().isEmpty()) {
                     writeCsv(file, typeChef.getOutput());

@@ -7,6 +7,8 @@ package de.uni_hildesheim.sse.kernel_miner.util.logic;
  */
 public final class False extends Formula {
 
+    private static final long serialVersionUID = 6422261057525028423L;
+
     @Override
     public boolean evaluate() {
         return false;

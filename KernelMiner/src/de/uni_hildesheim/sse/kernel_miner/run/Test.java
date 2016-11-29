@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
-import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
+import de.uni_hildesheim.sse.kernel_miner.code.typechef.TypeChef;
+import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 
 public class Test {
@@ -15,15 +16,23 @@ public class Test {
 //                "CONFIG_KALLSYMS || CONFIG_KALLSYMS_MODULE");
                 
         SourceFile file = new SourceFile(new File(
-//                "drivers/memstick/core/mspro_block.c"));
+//                "include/linux/jiffies.h"));
+//                "include/linux/rcupdate.h"));
+                "drivers/memstick/core/mspro_block.c"));
 //                "kernel/kallsyms.c"));
-                "kernel/smpboot.c"));
+//                "kernel/smpboot.c"));
+//                "arch/x86/crypto/crc32-pclmul_glue.c"));
 //        file.setPresenceCondition(pc);
         
-        TypeChefRun run = new TypeChefRun("kernelminer_tmp.properties");
+        TypeChefRun run = new TypeChefRun(
+                "res/windows.kernelminer.properties");
+//                "kernelminer_tmp.properties");
         TypeChef chef = run.createTypeChef();
         
         chef.runOnFile(file);
+        chef.parseTokens(file);
+        
+        Logger.INSTANCE.logInfo("Done; got " + file.getBlocks().size() + " blocks");
     }
     
 }

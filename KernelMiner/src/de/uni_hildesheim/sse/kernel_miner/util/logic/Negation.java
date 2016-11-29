@@ -7,6 +7,8 @@ package de.uni_hildesheim.sse.kernel_miner.util.logic;
  */
 public final class Negation extends Formula {
     
+    private static final long serialVersionUID = -7539218655156469390L;
+    
     private Formula formula;
     
     /**

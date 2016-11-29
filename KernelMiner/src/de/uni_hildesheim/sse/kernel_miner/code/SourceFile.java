@@ -20,6 +20,8 @@ public class SourceFile {
     
     private List<Block> blocks;
     
+    private List<CToken> tokens;
+    
     /**
      * Creates a new source file.
      * 
@@ -65,6 +67,14 @@ public class SourceFile {
      */
     public List<Block> getBlocks() {
         return Collections.unmodifiableList(blocks);
+    }
+    
+    public void setTokens(List<CToken> tokens) {
+        this.tokens = tokens;
+    }
+    
+    public List<CToken> getTokens() {
+        return tokens;
     }
     
 }

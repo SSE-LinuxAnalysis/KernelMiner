@@ -7,6 +7,8 @@ package de.uni_hildesheim.sse.kernel_miner.util.logic;
  */
 public final class Variable extends Formula {
     
+    private static final long serialVersionUID = -5566369071417331297L;
+
     private String name;
     
     private boolean value;

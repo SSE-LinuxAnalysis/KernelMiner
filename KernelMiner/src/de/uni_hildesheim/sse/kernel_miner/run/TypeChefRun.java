@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-import de.uni_hildesheim.sse.kernel_miner.code.TypeChef;
+import de.uni_hildesheim.sse.kernel_miner.code.typechef.TypeChef;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 
 /**
@@ -49,14 +49,21 @@ public class TypeChefRun extends TypeChefExtractor {
     protected TypeChef createTypeChef() {
         TypeChef chef = new TypeChef();
         
-        chef.setExe(new File(config.getProperty("typechef.exe")));
         chef.setSourceDir(new File(config.getProperty("typechef.sourceDir")));
-        chef.setKconfigModelsBase(new File(config.getProperty("typechef.kconfigModelBase")));
+        if (config.getProperty("typechef.openVariables") != null) {
+            chef.setOpenVariablesFile(new File(config.getProperty("typechef.openVariables")));
+        }
         chef.setSystemRoot(new File(config.getProperty("typechef.systemRoot", "/")));
         chef.setOutput(new File(config.getProperty("typechef.output", "typechef_output.zip")));
         chef.setWorkingDir(new File(config.getProperty("typechef.workingDir", ".")));
-        chef.setPartialConfHeader(new File(config.getProperty("typechef.partialConfHeader", "res/typechef/partial_conf.h")));
         chef.setPlatformHeader(new File(config.getProperty("typechef.platformHeader", "res/typechef/platform.h")));
+        
+        int staticIncludeIndex = 0;
+        String staticIncludeFile;
+        while ((staticIncludeFile = config.getProperty("typechef.staticInclude." + staticIncludeIndex)) != null) {
+            chef.addStaticInclude(new File(staticIncludeFile));
+            staticIncludeIndex++;
+        }
         
         int postIncludeIndex = 0;
         String postIncludeDir;
