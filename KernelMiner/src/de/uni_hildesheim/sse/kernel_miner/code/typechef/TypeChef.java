@@ -44,6 +44,8 @@ public class TypeChef {
     
     private List<File> sourceIncludeDirs;
     
+    private List<String> preprocessorDefines;
+    
     private ZipArchive output;
     
     private File workingDir;
@@ -56,6 +58,7 @@ public class TypeChef {
         staticIncludes = new ArrayList<>();
         postIncludeDirs = new ArrayList<>();
         sourceIncludeDirs = new ArrayList<>();
+        preprocessorDefines = new ArrayList<>();
     }
     
     /**
@@ -182,6 +185,14 @@ public class TypeChef {
      */
     public void clearSourceIncludeDirs() {
         sourceIncludeDirs.clear();
+    }
+    
+    public void addPreprocessorDefine(String symbol) {
+        preprocessorDefines.add(symbol);
+    }
+    
+    public void clearPreprocessorDefines() {
+        preprocessorDefines.clear();
     }
     
     /**
@@ -350,6 +361,11 @@ public class TypeChef {
         }
         for (File postIncludeDir : postIncludeDirs) {
             params.add("--postIncludes=" + postIncludeDir.getPath());
+        }
+        
+        // preprocessor definitions
+        for (String symbol : preprocessorDefines) {
+            params.add("-D" + symbol);
         }
         
         // the source file to parse

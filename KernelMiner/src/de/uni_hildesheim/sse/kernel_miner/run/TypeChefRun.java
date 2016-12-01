@@ -87,6 +87,13 @@ public class TypeChefRun extends TypeChefExtractor {
             sourceIncludeIndex++;
         }
         
+        int preprocessorDefinesIndex = 0;
+        String preprocessorDefine;
+        while ((preprocessorDefine = config.getProperty("typechef.preprocessorDefines." + preprocessorDefinesIndex)) != null) {
+            chef.addPreprocessorDefine(preprocessorDefine);
+            preprocessorDefinesIndex++;
+        }
+        
         return chef;
     }
 
