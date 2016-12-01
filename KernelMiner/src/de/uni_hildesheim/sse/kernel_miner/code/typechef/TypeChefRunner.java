@@ -103,15 +103,19 @@ public class TypeChefRunner {
     }
     
     private void convertResult() throws ExpressionFormatException {
-        errors = new ArrayList<>(lexerErrors.size());
-        for (LexerError error : lexerErrors) {
-            errors.add(error.getPositionStr() + " " + error.getMessage());
+        if (lexerErrors != null) {
+            errors = new ArrayList<>(lexerErrors.size());
+            for (LexerError error : lexerErrors) {
+                errors.add(error.getPositionStr() + " " + error.getMessage());
+            }
         }
         
-        tokens = new ArrayList<>(lexerTokens.size());
-        for (LexerToken original : lexerTokens) {
-            CToken converted = new CToken(original);
-            tokens.add(converted);
+        if (lexerTokens != null) {
+            tokens = new ArrayList<>(lexerTokens.size());
+            for (LexerToken original : lexerTokens) {
+                CToken converted = new CToken(original);
+                tokens.add(converted);
+            }
         }
     }
     

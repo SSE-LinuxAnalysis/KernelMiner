@@ -125,7 +125,6 @@ public abstract class TypeChefExtractor {
     
     private class TypeChefWorker implements Runnable {
         
-        
         private void runTypeChef(SourceFile file) {
             Logger.INSTANCE.logInfo("Running TypeChef on file " + file.getPath());
             try {
