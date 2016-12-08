@@ -40,7 +40,8 @@ public class TypeChefTest {
         CHEF.setSourceDir(new File(TESTDATA, "src"));
         CHEF.setOpenVariablesFile(new File(TESTDATA, "models/model.features"));
         CHEF.setSystemRoot(new File(TESTDATA, "res/systemRoot"));
-        CHEF.addDefaultPostIncludeDirs();
+//        CHEF.addDefaultPostIncludeDirs();
+        CHEF.addPostIncludeDir(new File("usr/include"));
         CHEF.addSourceIncludeDir(new File("include"));
         CHEF.setWorkingDir(TESTDATA);
         CHEF.addStaticInclude(new File("res/typechef/partial_conf.h"));

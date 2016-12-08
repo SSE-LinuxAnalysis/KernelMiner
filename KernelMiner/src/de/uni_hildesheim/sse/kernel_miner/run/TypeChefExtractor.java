@@ -125,17 +125,20 @@ public abstract class TypeChefExtractor {
     
     private class TypeChefWorker implements Runnable {
         
-        private void runTypeChef(SourceFile file) {
+        private boolean runTypeChef(SourceFile file) {
             Logger.INSTANCE.logInfo("Running TypeChef on file " + file.getPath());
             try {
-                typeChef.runOnFile(file);
+                boolean result = typeChef.runOnFile(file);
                 
                 Logger.INSTANCE.logInfo("Finished TypeChef on file " + file.getPath(),
                         typeChefTodo.size() + " files left");
                 
+                return result;
+                
             } catch (IllegalArgumentException | IOException e) {
                 Logger.INSTANCE.logException("Caught exception while running TypeChef for file " + file.getPath(), e);
             }
+            return false;
         }
         
         @Override
@@ -153,8 +156,9 @@ public abstract class TypeChefExtractor {
                         if (file == null) {
                             break;
                         }
-                        runTypeChef(file);
-                        parserTodo.add(file);
+                        if (runTypeChef(file)) {
+                            parserTodo.add(file);
+                        }
                         
                     } catch (Exception e) {
                         Logger.INSTANCE.logException("Caught exception while running TypeChef for file "

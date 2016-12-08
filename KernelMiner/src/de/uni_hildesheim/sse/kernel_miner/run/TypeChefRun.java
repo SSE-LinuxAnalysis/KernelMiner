@@ -57,6 +57,9 @@ public class TypeChefRun extends TypeChefExtractor {
         chef.setOutput(new File(config.getProperty("typechef.output", "typechef_output.zip")));
         chef.setWorkingDir(new File(config.getProperty("typechef.workingDir", ".")));
         chef.setPlatformHeader(new File(config.getProperty("typechef.platformHeader", "res/typechef/platform.h")));
+        if (config.getProperty("typechef.kbuildParams") != null) {
+            chef.setKbuildParamFile(new File(config.getProperty("typechef.kbuildParams")));
+        }
         
         int staticIncludeIndex = 0;
         String staticIncludeFile;

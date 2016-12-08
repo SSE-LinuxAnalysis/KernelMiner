@@ -1,8 +1,10 @@
 package de.uni_hildesheim.sse.kernel_miner.code.typechef;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -45,6 +47,8 @@ public class TypeChef {
     private List<File> sourceIncludeDirs;
     
     private List<String> preprocessorDefines;
+    
+    private File kbuildParamFile;
     
     private ZipArchive output;
     
@@ -195,6 +199,10 @@ public class TypeChef {
         preprocessorDefines.clear();
     }
     
+    public void setKbuildParamFile(File kbuilbParamFile) {
+        this.kbuildParamFile = kbuilbParamFile;
+    }
+    
     /**
      * Sets the output destination. A zip file with the given name will be created.
      * If the archive already exists, then the .pi files within will be reused and
@@ -241,13 +249,24 @@ public class TypeChef {
             throw new IllegalArgumentException("Platform header \"" + platformHeader + "\" is not readable");
         }
         
-        if (openVariablesFile == null || !openVariablesFile.isFile()) {
-            throw new IllegalArgumentException("openFeatures file not specified");
-        }
-        if (!openVariablesFile.canRead()) {
-            throw new IllegalArgumentException("openFeatures file can not be read");
+        if (openVariablesFile != null) {
+            if (!openVariablesFile.isFile()) {
+                throw new IllegalArgumentException("openFeatures file not specified");
+            }
+            if (!openVariablesFile.canRead()) {
+                throw new IllegalArgumentException("openFeatures file can not be read");
+            }
+        } else {
+            Logger.INSTANCE.logWarning("No openVariablesFile specified");
         }
         
+        if (systemRoot == null || !systemRoot.isDirectory()) {
+            throw new IllegalArgumentException("System root \"" + systemRoot + "\" is not a directory.");
+        }
+        
+        if (staticIncludes.isEmpty()) {
+            Logger.INSTANCE.logWarning("No static includes defined");
+        }
         for (File staticInclude : staticIncludes) {
             if (staticInclude == null || !staticInclude.isFile()) {
                 throw new IllegalArgumentException("Static include header \"" + staticIncludes + "\" does not exist");
@@ -257,21 +276,49 @@ public class TypeChef {
             }
         }
         
-        if (workingDir == null || !workingDir.isDirectory()) {
-            throw new IllegalArgumentException("Working directory \"" + workingDir + "\" is not a directory.");
+        if (postIncludeDirs.isEmpty()) {
+            Logger.INSTANCE.logWarning("No post include directories specified");
         }
-        if (!workingDir.canWrite()) {
-            throw new IllegalArgumentException("Source directory \"" + sourceDir + "\" is not writable.");
+        for (File postIncludeDir : postIncludeDirs) {
+            postIncludeDir = new File(systemRoot, postIncludeDir.getPath());
+            if (!postIncludeDir.isDirectory()) {
+                Logger.INSTANCE.logWarning("Post include directory \"" + postIncludeDir + "\" is not a directory");
+            }
+        }
+        
+        if (sourceIncludeDirs.isEmpty()) {
+            Logger.INSTANCE.logWarning("No source include directories specified");
+        }
+        for (File sourceIncludeDir : sourceIncludeDirs) {
+            sourceIncludeDir = new File(sourceDir, sourceIncludeDir.getPath());
+            if (!sourceIncludeDir.isDirectory()) {
+                Logger.INSTANCE.logWarning("Source include directory \"" + sourceIncludeDir + "\" is not a directory");
+            }
+        }
+        
+        // TODO: preprocessorDefines
+        
+        if (kbuildParamFile != null) {
+            if (!kbuildParamFile.isFile()) {
+                throw new IllegalArgumentException("kbuildParamFile \"" + kbuildParamFile + "\" does not exist");
+            }
+            if (!kbuildParamFile.canRead()) {
+                throw new IllegalArgumentException("kbuildParamFile \"" + kbuildParamFile + "\" is not readable");
+            }
+        } else {
+            Logger.INSTANCE.logWarning("No kbuildParamFile specified");
         }
         
         if (output == null) {
             throw new IllegalArgumentException("Output archive not specified.");
         }
         
-        if (systemRoot == null) {
-            throw new IllegalArgumentException("System root not specified.");
+        if (workingDir == null || !workingDir.isDirectory()) {
+            throw new IllegalArgumentException("Working directory \"" + workingDir + "\" is not a directory.");
         }
-        
+        if (!workingDir.canWrite()) {
+            throw new IllegalArgumentException("Source directory \"" + sourceDir + "\" is not writable.");
+        }
     }
     
     public void parseTokens(SourceFile sourcefile) {
@@ -331,7 +378,9 @@ public class TypeChef {
 
         // Kconfig variables
         params.add("--prefixonly=CONFIG_");
-        params.add("--openFeat=" + openVariablesFile.getAbsolutePath());
+        if (openVariablesFile != null) {
+            params.add("--openFeat=" + openVariablesFile.getAbsolutePath());
+        }
         
         // output
         params.add("--output=" + piOutput.getAbsolutePath().substring(0, piOutput.getAbsolutePath().length() - 3));
@@ -366,6 +415,34 @@ public class TypeChef {
         // preprocessor definitions
         for (String symbol : preprocessorDefines) {
             params.add("-D" + symbol);
+        }
+        
+        // kbuildParamFile
+        if (kbuildParamFile != null) {
+            BufferedReader in = null;
+            try {
+                in = new BufferedReader(new FileReader(kbuildParamFile));
+                String line;
+                while ((line = in.readLine()) != null) {
+                    String[] parts = line.split(": ");
+                    if (file.getPath().getPath().startsWith(parts[0])) {
+                        for (String flag : parts[1].split(" ")) {
+                            flag = flag.replace("$srcPath", sourceDir.getAbsolutePath());
+                            params.add(flag);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                Logger.INSTANCE.logException("Exception while reading kbuildparam file", e);
+            } finally {
+                if (in != null) {
+                    try {
+                        in.close();
+                    } catch (IOException e) {
+                        Logger.INSTANCE.logException("Exception while closing kbuildparam file", e);
+                    }
+                }
+            }
         }
         
         // the source file to parse
@@ -461,11 +538,19 @@ public class TypeChef {
      * 
      * @param file The {@link SourceFile} in the source code tree that should be parsed.
      * 
+     * @return <code>true</code> if file was actually parsed, false if result is already present.
+     * 
      * @throws IOException If running the TypeChef process or reading its output fails.
      * @throws IllegalArgumentException If any of the parameters in this object are faulty.
      */
-    public void runOnFile(SourceFile file) throws IOException, IllegalArgumentException {
+    public boolean runOnFile(SourceFile file) throws IOException, IllegalArgumentException {
         checkParameters();
+        
+        File csvFile = new File(file.getPath().getPath() + ".csv");
+        if (output.containsFile(csvFile) && output.getSize(csvFile) > 0) {
+            Logger.INSTANCE.logInfo("Skipping " + file.getPath() + " because a .csv file is already present");
+            return false;
+        }
         
         File piFile = new File(file.getPath().getPath() + ".pi");
         
@@ -487,8 +572,8 @@ public class TypeChef {
         
         if (status != 0) {
             Logger.INSTANCE.logError("The typechef instance for " + file.getPath() + " exited with status: " + status);
-            return;
         }
+        return true;
     }
     
 }
