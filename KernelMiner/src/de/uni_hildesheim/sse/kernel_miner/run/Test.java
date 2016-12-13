@@ -18,10 +18,11 @@ public class Test {
         SourceFile file = new SourceFile(new File(
 //                "include/linux/jiffies.h"));
 //                "include/linux/rcupdate.h"));
-                "drivers/memstick/core/mspro_block.c"));
+//                "drivers/memstick/core/mspro_block.c"));
 //                "kernel/kallsyms.c"));
 //                "kernel/smpboot.c"));
 //                "arch/x86/crypto/crc32-pclmul_glue.c"));
+                "drivers/media/dvb-frontends/a8293.c"));
 //        file.setPresenceCondition(pc);
         
         TypeChefRun run = new TypeChefRun(

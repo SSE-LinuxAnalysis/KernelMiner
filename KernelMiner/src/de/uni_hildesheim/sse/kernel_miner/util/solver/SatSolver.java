@@ -14,6 +14,8 @@ import org.sat4j.specs.ISolver;
 import org.sat4j.specs.TimeoutException;
 
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 
 public class SatSolver {
 
@@ -39,22 +41,29 @@ public class SatSolver {
         return isSatisfiable(solver);
     }
     
-    public boolean isSatisfiable(Formula constraint) throws SolverException {
+    /**
+     * @param defaultValue How unknown variables in constraint are treated:<ul>
+     *      <li>If <code>null</code>: Throw an exception</li>
+     *      <li>If <code>true</code>: Leave them open and continue to solve</li>
+     *      <li>If <code>false</code>: Add them as permanently <code>false</code> and continue to solve</li>
+     * </ul>
+     */
+    public boolean isSatisfiable(Formula constraint, Boolean defaultValue) throws SolverException {
         ISolver solver = getSolver();
         
         
         ICnfConverter cnfConverter = new RecursiveReplacingCnfConverter(varConverter);
         
-        List<Formula> dnfTerms;
+        List<Formula> cnfTerms;
         try {
-            dnfTerms = cnfConverter.convertToCnf(constraint);
+            cnfTerms = cnfConverter.convertToCnf(constraint);
         } catch (ConstraintException e) {
             throw new SolverException("Can't convert constraint to DNF", e);
         }
         
         
-        for (Formula term : dnfTerms) {
-            int[] numbers = varConverter.convertToDimacs(term);
+        for (int i = 0; i < cnfTerms.size(); i++) {
+            int[] numbers = convertToNumbers(cnfTerms.get(i), defaultValue, cnfTerms);
             try {
                 solver.addClause(new VecInt(numbers));
             } catch (ContradictionException e) {
@@ -63,6 +72,31 @@ public class SatSolver {
         }
         
         return isSatisfiable(solver);
+    }
+    
+    private int[] convertToNumbers(Formula cnfTerm, Boolean defaultValue, List<Formula> cnfTerms)
+            throws SolverException {
+        
+        int[] numbers = null;
+        
+        do {
+            
+            try {
+                numbers = varConverter.convertToDimacs(cnfTerm);
+            } catch (VarNotFoundException e) {
+                if (defaultValue == null) {
+                    throw new SolverException("Variable not found in DIMACS model and no default value specified", e);
+                } else {
+                    varConverter.addVarible(e.getName());
+                    if (!defaultValue) {
+                        // add the variable as always false
+                        cnfTerms.add(new Negation(new Variable(e.getName())));
+                    }
+                }
+            }
+        } while (numbers == null);
+       
+        return numbers;
     }
     
     private boolean isSatisfiable(ISolver solver) throws SolverException {

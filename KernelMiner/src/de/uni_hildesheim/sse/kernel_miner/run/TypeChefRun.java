@@ -60,6 +60,9 @@ public class TypeChefRun extends TypeChefExtractor {
         if (config.getProperty("typechef.kbuildParams") != null) {
             chef.setKbuildParamFile(new File(config.getProperty("typechef.kbuildParams")));
         }
+        if (config.getProperty("typechef.dimacsModel") != null) {
+            chef.setDimacsModel(new File(config.getProperty("typechef.dimacsModel")));
+        }
         
         int staticIncludeIndex = 0;
         String staticIncludeFile;

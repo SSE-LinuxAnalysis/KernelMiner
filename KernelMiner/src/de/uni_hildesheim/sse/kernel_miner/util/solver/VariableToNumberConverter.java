@@ -145,13 +145,13 @@ public class VariableToNumberConverter {
         return combined;
     }
 
-    public int[] convertToDimacs(Formula disjunctionTerm) throws SolverException {
+    public int[] convertToDimacs(Formula disjunctionTerm) throws SolverException, VarNotFoundException {
         if (disjunctionTerm instanceof Negation) {
             Formula var = ((Negation) disjunctionTerm).getFormula();
             if (!(var instanceof Variable)) {
                 throw new SolverException("Invalid disjunctionTerm, expected variable after negation: " + disjunctionTerm);
             }
-            int number = getOrCreate(((Variable) var).getName());
+            int number = getNumber(((Variable) var).getName());
             return new int[] { -1 * number };
             
         } else if (disjunctionTerm instanceof Disjunction) {
@@ -160,7 +160,7 @@ public class VariableToNumberConverter {
             return merge(left, right);
             
         } else if (disjunctionTerm instanceof Variable) {
-            int number = getOrCreate(((Variable) disjunctionTerm).getName());
+            int number = getNumber(((Variable) disjunctionTerm).getName());
             return new int[] { number };
             
         } else {

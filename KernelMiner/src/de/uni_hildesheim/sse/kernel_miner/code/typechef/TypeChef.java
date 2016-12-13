@@ -23,6 +23,9 @@ import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.SatSolver;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.SolverException;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,
@@ -49,6 +52,8 @@ public class TypeChef {
     private List<String> preprocessorDefines;
     
     private File kbuildParamFile;
+    
+    private File dimacsModel;
     
     private ZipArchive output;
     
@@ -203,6 +208,10 @@ public class TypeChef {
         this.kbuildParamFile = kbuilbParamFile;
     }
     
+    public void setDimacsModel(File dimacsModel) {
+        this.dimacsModel = dimacsModel;
+    }
+    
     /**
      * Sets the output destination. A zip file with the given name will be created.
      * If the archive already exists, then the .pi files within will be reused and
@@ -292,7 +301,7 @@ public class TypeChef {
         for (File sourceIncludeDir : sourceIncludeDirs) {
             sourceIncludeDir = new File(sourceDir, sourceIncludeDir.getPath());
             if (!sourceIncludeDir.isDirectory()) {
-                Logger.INSTANCE.logWarning("Source include directory \"" + sourceIncludeDir + "\" is not a directory");
+//                Logger.INSTANCE.logWarning("Source include directory \"" + sourceIncludeDir + "\" is not a directory");
             }
         }
         
@@ -307,6 +316,17 @@ public class TypeChef {
             }
         } else {
             Logger.INSTANCE.logWarning("No kbuildParamFile specified");
+        }
+        
+        if (dimacsModel != null) {
+            if (!dimacsModel.isFile()) {
+                throw new IllegalArgumentException("dimacsModel \"" + dimacsModel + "\" does not exist");
+            }
+            if (!dimacsModel.canRead()) {
+                throw new IllegalArgumentException("dimacsModel \"" + dimacsModel + "\" is not readable");
+            }
+        } else {
+            Logger.INSTANCE.logWarning("No DIMACS model specified");
         }
         
         if (output == null) {
@@ -546,10 +566,28 @@ public class TypeChef {
     public boolean runOnFile(SourceFile file) throws IOException, IllegalArgumentException {
         checkParameters();
         
+        // check if we already got output
         File csvFile = new File(file.getPath().getPath() + ".csv");
         if (output.containsFile(csvFile) && output.getSize(csvFile) > 0) {
             Logger.INSTANCE.logInfo("Skipping " + file.getPath() + " because a .csv file is already present");
             return false;
+        }
+        
+        // check if file PC is even satisfiable
+        if (dimacsModel != null && file.getPresenceCondition() != null
+                && !(file.getPresenceCondition() instanceof True)) {
+            try {
+                SatSolver solver = new SatSolver(dimacsModel);
+                
+                if (!solver.isSatisfiable(file.getPresenceCondition(), false)) {
+                    Logger.INSTANCE.logInfo("Skipping " + file.getPath() + " because it's PC is not satisfiable:",
+                            file.getPresenceCondition().toString());
+                    return false;
+                }
+                
+            } catch (SolverException e) {
+                Logger.INSTANCE.logException("Failed to solve file PC; running anyways", e);
+            }
         }
         
         File piFile = new File(file.getPath().getPath() + ".pi");
