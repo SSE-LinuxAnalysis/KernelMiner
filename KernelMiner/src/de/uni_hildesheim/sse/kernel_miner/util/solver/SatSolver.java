@@ -16,6 +16,9 @@ import org.sat4j.specs.TimeoutException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.ConstraintException;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.ICnfConverter;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.RecursiveReplacingCnfConverter;
 
 public class SatSolver {
 
@@ -27,10 +30,10 @@ public class SatSolver {
         varConverter = new VariableToNumberConverter();
     }
     
-    public SatSolver(File dimacsModel) throws SolverException {
+    public SatSolver(File dimacsModel, String prefix) throws SolverException {
         this.dimacsModel = dimacsModel;
         try {
-            varConverter = new VariableToNumberConverter(dimacsModel, "CONFIG_");
+            varConverter = new VariableToNumberConverter(dimacsModel, prefix);
         } catch (IOException e) {
             throw new SolverException("Can't read DIMACS file", e);
         }
@@ -110,12 +113,15 @@ public class SatSolver {
     private ISolver getSolver() throws SolverException {
         ISolver solver = SolverFactory.newDefault();
         solver.setDBSimplificationAllowed(false);
-        Reader reader = new DimacsReader(solver);
         
-        try {
-            reader.parseInstance(dimacsModel.getAbsolutePath());
-        } catch (ParseFormatException | IOException | ContradictionException e) {
-            throw new SolverException("Can't create solver", e);
+        if (dimacsModel != null) {
+            Reader reader = new DimacsReader(solver);
+            
+            try {
+                reader.parseInstance(dimacsModel.getAbsolutePath());
+            } catch (ParseFormatException | IOException | ContradictionException e) {
+                throw new SolverException("Can't create solver", e);
+            }
         }
         
         return solver;

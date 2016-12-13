@@ -577,7 +577,7 @@ public class TypeChef {
         if (dimacsModel != null && file.getPresenceCondition() != null
                 && !(file.getPresenceCondition() instanceof True)) {
             try {
-                SatSolver solver = new SatSolver(dimacsModel);
+                SatSolver solver = new SatSolver(dimacsModel, "CONFIG_");
                 
                 if (!solver.isSatisfiable(file.getPresenceCondition(), false)) {
                     Logger.INSTANCE.logInfo("Skipping " + file.getPath() + " because it's PC is not satisfiable:",

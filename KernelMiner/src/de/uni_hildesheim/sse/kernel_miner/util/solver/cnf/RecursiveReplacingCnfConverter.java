@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.util.solver;
+package de.uni_hildesheim.sse.kernel_miner.util.solver.cnf;
 
 import java.util.List;
 
@@ -7,6 +7,7 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Disjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
+import de.uni_hildesheim.sse.kernel_miner.util.solver.VariableToNumberConverter;
 
 /**
  * Introduces new variables to simplify overall constraint.
