@@ -12,16 +12,15 @@ import de.uni_hildesheim.sse.kernel_miner.util.Files;
 
 public class FilesTest {
 
-    private static final File testdata = new File("testdata/FilesTest");
+    private static final File TESTDATA = new File("testdata/FilesTest");
     
     @Test
     public void testRelativizeWithExistingFiles() {
-        File dir = testdata;
-        File fileInDir = new File(dir.getPath() + "/existingFile.txt");
+        File fileInDir = new File(TESTDATA.getPath() + "/existingFile.txt");
         
-        Assert.assertEquals(dir.getPath().length() + 17, fileInDir.getPath().length());
+        Assert.assertEquals(TESTDATA.getPath().length() + 17, fileInDir.getPath().length());
         
-        String relative = Files.relativize(fileInDir, dir);
+        String relative = Files.relativize(fileInDir, TESTDATA);
         
         Assert.assertEquals("existingFile.txt", relative);
     }
@@ -64,7 +63,7 @@ public class FilesTest {
     
     @Test
     public void testReadFileSmallText() throws IOException {
-        File toRead = new File(testdata, "testReadFile1.txt");
+        File toRead = new File(TESTDATA, "testReadFile1.txt");
 
         String content = Files.readFile(toRead);
 
@@ -73,7 +72,7 @@ public class FilesTest {
 
     @Test
     public void testReadFileBigText() throws IOException {
-        File toRead = new File(testdata, "testReadFile2.txt");
+        File toRead = new File(TESTDATA, "testReadFile2.txt");
 
         String content = Files.readFile(toRead);
 
@@ -85,7 +84,7 @@ public class FilesTest {
     
     @Test
     public void testReadFileNonExisting() throws IOException {
-        File toRead = new File(testdata, "doesntExist.txt");
+        File toRead = new File(TESTDATA, "doesntExist.txt");
         
         try {
             Files.readFile(toRead);
@@ -116,7 +115,7 @@ public class FilesTest {
     
     @Test
     public void testWriteFile() throws IOException {
-        File toWrite = new File(testdata, "testWriteFile.txt");
+        File toWrite = new File(TESTDATA, "testWriteFile.txt");
         toWrite.deleteOnExit();
         Assert.assertFalse(toWrite.exists());
         
@@ -131,7 +130,7 @@ public class FilesTest {
     
     @Test
     public void testOverwriteFile() throws IOException {
-        File toWrite = new File(testdata, "testOverwriteFile.txt");
+        File toWrite = new File(TESTDATA, "testOverwriteFile.txt");
         toWrite.deleteOnExit();
         Assert.assertFalse(toWrite.exists());
         

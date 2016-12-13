@@ -15,14 +15,14 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 
 public class KbuildMinerTest {
     
-    private static final File testdata = new File("testdata/KbuildMinerTest");
+    private static final File TESTDATA = new File("testdata/KbuildMinerTest");
     
     @Test
     public void testReadOutput() throws IOException {
         ByteArrayOutputStream log = new ByteArrayOutputStream();
         Logger.init(log);
         
-        File pcs = new File(testdata, "pcs.txt");
+        File pcs = new File(TESTDATA, "pcs.txt");
         
         List<SourceFile> files = KbuildMiner.readOutput(pcs);
         Assert.assertEquals(15952, files.size());
@@ -60,7 +60,7 @@ public class KbuildMinerTest {
         ByteArrayOutputStream log = new ByteArrayOutputStream();
         Logger.init(log);
         
-        File pcs = new File(testdata, "invalid_pcs.txt");
+        File pcs = new File(TESTDATA, "invalid_pcs.txt");
         
         List<SourceFile> files = KbuildMiner.readOutput(pcs);
         Assert.assertEquals(8, files.size());

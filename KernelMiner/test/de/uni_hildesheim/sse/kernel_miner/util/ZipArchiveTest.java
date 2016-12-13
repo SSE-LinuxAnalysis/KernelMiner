@@ -12,11 +12,11 @@ import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 
 public class ZipArchiveTest {
 
-    private static final File testdata = new File("testdata/ZipArchiveTest");
+    private static final File TESTDATA = new File("testdata/ZipArchiveTest");
     
     @Test
     public void testCreation() throws IOException {
-        File zipFile = new File(testdata, "testCreation.zip");
+        File zipFile = new File(TESTDATA, "testCreation.zip");
         zipFile.deleteOnExit();
         if (zipFile.exists()) {
             zipFile.delete();
@@ -32,7 +32,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testInvalidCreation() throws IOException {
-        File zipFile = new File(testdata, "testInvalidCreation.notzip");
+        File zipFile = new File(TESTDATA, "testInvalidCreation.notzip");
         zipFile.deleteOnExit();
         if (zipFile.exists()) {
             zipFile.delete();
@@ -50,7 +50,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testContainsFile() {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         Assert.assertTrue(archive.containsFile(new File("test.txt")));
@@ -63,7 +63,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testContainsFileOnDirectory() {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         Assert.assertFalse(archive.containsFile(new File("dir")));
@@ -72,7 +72,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testReadFile() throws FileNotFoundException, IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
 
         String read = archive.readFile(new File("test.txt"));
@@ -82,7 +82,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testReadNotExistingFile() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         try {
@@ -95,7 +95,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testGetSize() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
 
         Assert.assertEquals(13, archive.getSize(new File("test.txt")));
@@ -103,7 +103,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testGetSizeNotExisting() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         try {
@@ -115,7 +115,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testWriteAndDeleteFile() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         File toWrite = new File("testWrite.txt");
@@ -135,7 +135,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testDeleteNonExissting() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         Assert.assertFalse(archive.containsFile(new File("doesntExist.txt")));
@@ -150,7 +150,7 @@ public class ZipArchiveTest {
     
     @Test
     public void testOverwriteFile() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         File toWrite = new File("testOverwrite.txt");
@@ -176,11 +176,11 @@ public class ZipArchiveTest {
     
     @Test
     public void testCopyFileToArchive() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         File insideFile = new File("testCopy.txt");
-        File outsideFile = new File(testdata, "testfile.txt");
+        File outsideFile = new File(TESTDATA, "testfile.txt");
         
         Assert.assertTrue(outsideFile.exists());
         
@@ -199,11 +199,11 @@ public class ZipArchiveTest {
     
     @Test
     public void testExtract() throws IOException {
-        File zipFile = new File(testdata, "archive.zip");
+        File zipFile = new File(TESTDATA, "archive.zip");
         ZipArchive archive = new ZipArchive(zipFile);
         
         File insideFile = new File("test.txt");
-        File outsideFile = new File(testdata, "testExtract.txt");
+        File outsideFile = new File(TESTDATA, "testExtract.txt");
         
         Assert.assertFalse(outsideFile.exists());
         Assert.assertTrue(archive.containsFile(insideFile));
