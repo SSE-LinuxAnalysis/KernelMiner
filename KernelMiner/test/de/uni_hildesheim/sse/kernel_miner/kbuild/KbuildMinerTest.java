@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.tests.kbuild;
+package de.uni_hildesheim.sse.kernel_miner.kbuild;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

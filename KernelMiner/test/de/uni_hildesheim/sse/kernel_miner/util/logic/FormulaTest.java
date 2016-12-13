@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.tests.util.logic;
+package de.uni_hildesheim.sse.kernel_miner.util.logic;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -1,11 +1,11 @@
-package de.uni_hildesheim.sse.kernel_miner.tests.util;
+package de.uni_hildesheim.sse.kernel_miner.util;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import de.uni_hildesheim.sse.kernel_miner.tests.util.logic.FormulaTest;
-import de.uni_hildesheim.sse.kernel_miner.tests.util.parser.ParserTest;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.FormulaTest;
+import de.uni_hildesheim.sse.kernel_miner.util.parser.ParserTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({

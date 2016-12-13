@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.tests.code;
+package de.uni_hildesheim.sse.kernel_miner.code;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

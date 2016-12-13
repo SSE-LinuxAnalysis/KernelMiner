@@ -58,7 +58,7 @@ public class SatSolver {
         try {
             cnfTerms = cnfConverter.convertToCnf(constraint);
         } catch (ConstraintException e) {
-            throw new SolverException("Can't convert constraint to DNF", e);
+            throw new SolverException("Can't convert constraint to CNF", e);
         }
         
         

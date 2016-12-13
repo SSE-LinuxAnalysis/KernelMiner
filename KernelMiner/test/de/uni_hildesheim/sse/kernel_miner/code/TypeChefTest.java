@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.tests.code;
+package de.uni_hildesheim.sse.kernel_miner.code;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
