@@ -24,8 +24,8 @@ import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
-import de.uni_hildesheim.sse.kernel_miner.util.solver.SatSolver;
-import de.uni_hildesheim.sse.kernel_miner.util.solver.SolverException;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.SatSolver;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.SolverException;
 
 /**
  * This class utilizes TypeChef to populate {@link SourceFile}s with {@link Block}s,

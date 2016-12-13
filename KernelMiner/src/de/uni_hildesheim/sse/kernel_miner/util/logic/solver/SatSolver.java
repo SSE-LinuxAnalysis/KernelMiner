@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.util.solver;
+package de.uni_hildesheim.sse.kernel_miner.util.logic.solver;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,9 +16,9 @@ import org.sat4j.specs.TimeoutException;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
-import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.ConstraintException;
-import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.ICnfConverter;
-import de.uni_hildesheim.sse.kernel_miner.util.solver.cnf.RecursiveReplacingCnfConverter;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.cnf.ConstraintException;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.cnf.ICnfConverter;
+import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.cnf.RecursiveReplacingCnfConverter;
 
 public class SatSolver {
 

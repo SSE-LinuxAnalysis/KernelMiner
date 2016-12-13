@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.util.solver;
+package de.uni_hildesheim.sse.kernel_miner.util.logic.solver;
 
 /**
  * This exception is thrown by a {@link VariableToNumberConverter} if a variable

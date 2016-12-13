@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.util.solver.cnf;
+package de.uni_hildesheim.sse.kernel_miner.util.logic.solver.cnf;
 
 import java.util.LinkedList;
 import java.util.List;

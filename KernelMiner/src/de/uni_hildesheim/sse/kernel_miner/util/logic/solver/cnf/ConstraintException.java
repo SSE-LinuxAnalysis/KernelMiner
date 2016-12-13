@@ -1,4 +1,4 @@
-package de.uni_hildesheim.sse.kernel_miner.util.solver.cnf;
+package de.uni_hildesheim.sse.kernel_miner.util.logic.solver.cnf;
 
 public class ConstraintException extends Exception {
 
