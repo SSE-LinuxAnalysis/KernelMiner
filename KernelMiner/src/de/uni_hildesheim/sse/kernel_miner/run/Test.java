@@ -22,7 +22,8 @@ public class Test {
 //                "kernel/kallsyms.c"));
 //                "kernel/smpboot.c"));
 //                "arch/x86/crypto/crc32-pclmul_glue.c"));
-                "drivers/media/dvb-frontends/a8293.c"));
+//                "arch/x86/kernel/acpi/boot.c"));
+                "drivers/acpi/acpica/dsargs.c"));
 //        file.setPresenceCondition(pc);
         
         TypeChefRun run = new TypeChefRun(

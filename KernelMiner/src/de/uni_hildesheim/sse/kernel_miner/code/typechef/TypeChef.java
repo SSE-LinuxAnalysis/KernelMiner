@@ -35,6 +35,12 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.solver.SolverException;
  */
 public class TypeChef {
     
+    /**
+     * Whether to launch a separate JVM or not. Set to <code>true</code> only
+     * for debug purposes.
+     */
+    private static final boolean CALL_IN_SAME_VM = false;
+    
     private File sourceDir;
     
     private File platformHeader;
@@ -445,7 +451,7 @@ public class TypeChef {
                 String line;
                 while ((line = in.readLine()) != null) {
                     String[] parts = line.split(": ");
-                    if (file.getPath().getPath().startsWith(parts[0])) {
+                    if (file.getPath().getPath().replace("\\", "/").startsWith(parts[0])) {
                         for (String flag : parts[1].split(" ")) {
                             flag = flag.replace("$srcPath", sourceDir.getAbsolutePath());
                             params.add(flag);
@@ -523,17 +529,30 @@ public class TypeChef {
         };
         comm.start();
         
-        ProcessBuilder builder = new ProcessBuilder("java",
-                "-Xmx20g",
-                "-cp", System.getProperty("java.class.path"),
-                TypeChefRunner.class.getName(),
-                serSock.getLocalPort() + "");
-        builder.redirectError(Redirect.INHERIT);
-        builder.redirectOutput(Redirect.INHERIT);
-        Process process = builder.start();
+        if (CALL_IN_SAME_VM) {
+            try {
+                TypeChefRunner.main(new String[] {String.valueOf(serSock.getLocalPort())});
+            } catch (Exception e) {
+                Logger.INSTANCE.logException("Exception in TypeChefRunner", e);
+            }
+        } else {
+            ProcessBuilder builder = new ProcessBuilder("java",
+                    "-Xmx20g",
+                    "-cp", System.getProperty("java.class.path"),
+                    TypeChefRunner.class.getName(),
+                    String.valueOf(serSock.getLocalPort()));
+            builder.redirectError(Redirect.INHERIT);
+            builder.redirectOutput(Redirect.INHERIT);
+            Process process = builder.start();
+            
+            try {
+                process.waitFor();
+            } catch (InterruptedException e) {
+                Logger.INSTANCE.logException("Exception while waiting", e);
+            }
+        }
         
         try {
-            process.waitFor();
             comm.join();
         } catch (InterruptedException e) {
             Logger.INSTANCE.logException("Exception while waiting", e);
