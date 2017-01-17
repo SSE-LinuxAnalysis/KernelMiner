@@ -437,6 +437,7 @@ public class TypeChef {
         
         // kbuildParamFile
         if (kbuildParamFile != null) {
+            kbuildParamFile.setSourceDir(sourceDir);
             params.addAll(kbuildParamFile.getExtraParameters(file));
         }
         

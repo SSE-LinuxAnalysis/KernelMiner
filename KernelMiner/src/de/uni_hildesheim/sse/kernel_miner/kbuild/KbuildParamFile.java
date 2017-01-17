@@ -16,9 +16,15 @@ public class KbuildParamFile {
     
     private Map<File, List<String>> parameters;
 
+    private File sourceDir;
+    
     public KbuildParamFile(File file) throws IOException {
         parameters = new HashMap<>();
         readFile(file);
+    }
+    
+    public void setSourceDir(File sourceDir) {
+        this.sourceDir = sourceDir;
     }
     
     public List<String> getExtraParameters(SourceFile file) {
@@ -27,6 +33,22 @@ public class KbuildParamFile {
         for (Map.Entry<File, List<String>> entry : parameters.entrySet()) {
             if (file.getPath().getPath().startsWith(entry.getKey().getPath())) {
                 result.addAll(entry.getValue());
+            }
+        }
+        
+        for (int i = 0; i < result.size(); i++) {
+            String param = result.get(i);
+            if (param.indexOf('$') != -1) {
+                if (sourceDir != null) {
+                    param = param.replace("$srcPath", sourceDir.getPath().toString());
+                } else if (param.contains("$srcPath")) {
+                    Logger.INSTANCE.logError("sourceDir not specified; can't resolve $srcPath");
+                }
+                
+                if (param.indexOf('$') != -1) {
+                    Logger.INSTANCE.logWarning("Unkown variable in KbuildParamFile:", param);
+                }
+                result.set(i, param);
             }
         }
         

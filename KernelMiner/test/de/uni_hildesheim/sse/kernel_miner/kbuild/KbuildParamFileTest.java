@@ -130,4 +130,16 @@ public class KbuildParamFileTest {
         Assert.assertEquals("-DSTR=Some String with Spaces", params2.get(0));
     }
     
+    @Test
+    public void testSourcePath() throws IOException {
+        KbuildParamFile paramFile = new KbuildParamFile(new File(TESTDATA, "srcPath.sh"));
+        paramFile.setSourceDir(new File("testTest"));
+        
+        SourceFile sourceFile1 = new SourceFile(new File("src/dir/file1.c"));
+        List<String> params1 = paramFile.getExtraParameters(sourceFile1);
+        Assert.assertEquals(2, params1.size());
+        Assert.assertEquals("-I", params1.get(0));
+        Assert.assertEquals("testTest/include", params1.get(1));
+    }
+    
 }
