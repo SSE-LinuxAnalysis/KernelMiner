@@ -10,6 +10,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import de.uni_hildesheim.sse.kernel_miner.code.typechef.TypeChef;
+import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildParamFile;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 
 /**
@@ -58,7 +59,11 @@ public class TypeChefRun extends TypeChefExtractor {
         chef.setWorkingDir(new File(config.getProperty("typechef.workingDir", ".")));
         chef.setPlatformHeader(new File(config.getProperty("typechef.platformHeader", "res/typechef/platform.h")));
         if (config.getProperty("typechef.kbuildParams") != null) {
-            chef.setKbuildParamFile(new File(config.getProperty("typechef.kbuildParams")));
+            try {
+                chef.setKbuildParamFile(new KbuildParamFile(new File(config.getProperty("typechef.kbuildParams"))));
+            } catch (IOException e) {
+                Logger.INSTANCE.logException("Can't read KbuildParamFile", e);
+            }
         }
         if (config.getProperty("typechef.dimacsModel") != null) {
             chef.setDimacsModel(new File(config.getProperty("typechef.dimacsModel")));

@@ -1,18 +1,21 @@
-
-#define __ARG_PLACEHOLDER_1 0,
-#define config_enabled(cfg) defined(cfg)
-//#define _config_enabled(value) __config_enabled(__ARG_PLACEHOLDER_##value)
-//#define __config_enabled(arg1_or_junk) ___config_enabled(arg1_or_junk 1, 0)
-//#define ___config_enabled(__ignored, val, ...) val
-
-#define IS_ENABLED(option) (config_enabled(option) || config_enabled(option##_MODULE))
-
-#define IS_BUILTIN(option) config_enabled(option)
-
-#define IS_MODULE(option) config_enabled(option##_MODULE)
-
-#if IS_BUILTIN(CONFIG_MAX)
-	test
-#else
-	other test
+#ifdef CONFIG_ACPI
+	#define ACPI_DEBUG_OUTPUT
 #endif
+
+#ifdef ACPI_DEBUG_OUTPUT
+	#define ACPI_DEBUG_PARAMETERS valueParam1, valueParam2
+	#define ACPI_DO_DEBUG_PRINT(param1, param2) param2
+	#define ACPI_DEBUG_PRINT(plist) ACPI_DO_DEBUG_PRINT plist
+
+#else
+	#define ACPI_DEBUG_PRINT(pl)
+
+#endif
+
+int main() {
+	ACPI_DEBUG_PRINT((ACPI_DEBUG_PARAMETERS));
+	return 0;
+}
+
+// TypeChef params:
+// --lex --no-analysis --prefixonly=CONFIG_ --output=testout test.c

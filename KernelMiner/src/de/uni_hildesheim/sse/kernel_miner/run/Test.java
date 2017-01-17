@@ -23,7 +23,9 @@ public class Test {
 //                "kernel/smpboot.c"));
 //                "arch/x86/crypto/crc32-pclmul_glue.c"));
 //                "arch/x86/kernel/acpi/boot.c"));
-                "drivers/acpi/acpica/dsargs.c"));
+//                "drivers/acpi/acpica/dsargs.c"));
+//                "drivers/acpi/acpica/evevent.c"));
+                "drivers/xen/xen-acpi-processor.c"));
 //        file.setPresenceCondition(pc);
         
         TypeChefRun run = new TypeChefRun(

@@ -8,6 +8,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
     KbuildMinerTest.class,
     KbuildMinerPcGrammarTest.class,
+    KbuildParamFileTest.class,
 })
 public class AllKbuildTests {
 

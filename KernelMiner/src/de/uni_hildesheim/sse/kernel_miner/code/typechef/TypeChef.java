@@ -1,10 +1,8 @@
 package de.uni_hildesheim.sse.kernel_miner.code.typechef;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.EOFException;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,6 +17,7 @@ import java.util.List;
 import de.uni_hildesheim.sse.kernel_miner.code.Block;
 import de.uni_hildesheim.sse.kernel_miner.code.CToken;
 import de.uni_hildesheim.sse.kernel_miner.code.SourceFile;
+import de.uni_hildesheim.sse.kernel_miner.kbuild.KbuildParamFile;
 import de.uni_hildesheim.sse.kernel_miner.util.Files;
 import de.uni_hildesheim.sse.kernel_miner.util.Logger;
 import de.uni_hildesheim.sse.kernel_miner.util.ZipArchive;
@@ -57,7 +56,7 @@ public class TypeChef {
     
     private List<String> preprocessorDefines;
     
-    private File kbuildParamFile;
+    private KbuildParamFile kbuildParamFile;
     
     private File dimacsModel;
     
@@ -210,7 +209,7 @@ public class TypeChef {
         preprocessorDefines.clear();
     }
     
-    public void setKbuildParamFile(File kbuilbParamFile) {
+    public void setKbuildParamFile(KbuildParamFile kbuilbParamFile) {
         this.kbuildParamFile = kbuilbParamFile;
     }
     
@@ -313,14 +312,7 @@ public class TypeChef {
         
         // TODO: preprocessorDefines
         
-        if (kbuildParamFile != null) {
-            if (!kbuildParamFile.isFile()) {
-                throw new IllegalArgumentException("kbuildParamFile \"" + kbuildParamFile + "\" does not exist");
-            }
-            if (!kbuildParamFile.canRead()) {
-                throw new IllegalArgumentException("kbuildParamFile \"" + kbuildParamFile + "\" is not readable");
-            }
-        } else {
+        if (kbuildParamFile == null) {
             Logger.INSTANCE.logWarning("No kbuildParamFile specified");
         }
         
@@ -445,30 +437,7 @@ public class TypeChef {
         
         // kbuildParamFile
         if (kbuildParamFile != null) {
-            BufferedReader in = null;
-            try {
-                in = new BufferedReader(new FileReader(kbuildParamFile));
-                String line;
-                while ((line = in.readLine()) != null) {
-                    String[] parts = line.split(": ");
-                    if (file.getPath().getPath().replace("\\", "/").startsWith(parts[0])) {
-                        for (String flag : parts[1].split(" ")) {
-                            flag = flag.replace("$srcPath", sourceDir.getAbsolutePath());
-                            params.add(flag);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                Logger.INSTANCE.logException("Exception while reading kbuildparam file", e);
-            } finally {
-                if (in != null) {
-                    try {
-                        in.close();
-                    } catch (IOException e) {
-                        Logger.INSTANCE.logException("Exception while closing kbuildparam file", e);
-                    }
-                }
-            }
+            params.addAll(kbuildParamFile.getExtraParameters(file));
         }
         
         // the source file to parse
