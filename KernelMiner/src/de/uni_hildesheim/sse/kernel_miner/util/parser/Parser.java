@@ -7,6 +7,8 @@ import java.util.List;
 /**
  * Parses strings based on {@link Grammar}s.
  * 
+ * @param <T> The type of formula that this parser will construct. A proper {@link Grammar} needs to be supplied.
+ * 
  * @author Adam Krafczyk
  */
 public class Parser<T> {

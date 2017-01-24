@@ -83,7 +83,8 @@ public class Files {
                 if (in != null) {
                     in.close();
                 }
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
         
         return content;

@@ -32,7 +32,7 @@ public class VariableToNumberConverter {
      * <br />(undertaker format)
      * 
      * @param dimacsModel The DIMACS model file.
-     * @param prefix A prefix that is added before all variables found in the DIMACS model file.
+     * @param prefix A prefix that is added in front of all variables found in the DIMACS model file.
      * 
      * @throws IOException If reading the file fails.
      */
@@ -99,7 +99,6 @@ public class VariableToNumberConverter {
      */
     public String getName(int number) {
         for (String name : mapping.keySet()) {
-            // TODO: ENABLE_ for busybox
             try {
                 if (getNumber(name) == number) {
                     return name;
@@ -121,10 +120,6 @@ public class VariableToNumberConverter {
      * @return The number for the new variable.
      */
     public int addVarible(String name) {
-        return getOrCreate(name);
-    }
-    
-    private int getOrCreate(String name) {
         if (mapping.get(name) != null) {
             return mapping.get(name);
         } else {
@@ -145,6 +140,15 @@ public class VariableToNumberConverter {
         return combined;
     }
 
+    /**
+     * Converts the given CNF term into a DIMACS number line.
+     * 
+     * @param disjunctionTerm The term to convert. Must only contain variables, negations and disjunctions.
+     * @return The DIMACS number representation of the given term.
+     * 
+     * @throws SolverException If an invalid element was found in the term.
+     * @throws VarNotFoundException If a variable in this term has no mapping to a number.
+     */
     public int[] convertToDimacs(Formula disjunctionTerm) throws SolverException, VarNotFoundException {
         if (disjunctionTerm instanceof Negation) {
             Formula var = ((Negation) disjunctionTerm).getFormula();

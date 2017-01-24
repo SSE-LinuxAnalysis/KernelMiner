@@ -1,7 +1,7 @@
 package de.uni_hildesheim.sse.kernel_miner.util.parser;
 
 /**
- * An operator token of an expression to be parsed
+ * An operator token of an expression to be parsed.
  * 
  * @author Adam Krafczyk
  */

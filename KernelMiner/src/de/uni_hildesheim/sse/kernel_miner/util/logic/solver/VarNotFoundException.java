@@ -20,7 +20,7 @@ public class VarNotFoundException extends Exception {
     /**
      * @return The name of the variable that is not found.
      */
-    public String getName() {
+    public String getVariableName() {
         return name;
     }
 

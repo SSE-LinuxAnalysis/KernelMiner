@@ -3,7 +3,6 @@ package de.uni_hildesheim.sse.kernel_miner.code;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.uni_hildesheim.sse.kernel_miner.code.Block;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.True;
 
 public class BlockTest {

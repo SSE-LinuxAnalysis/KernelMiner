@@ -5,7 +5,6 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Disjunction;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Formula;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Negation;
 import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
-import de.uni_hildesheim.sse.kernel_miner.util.parser.Grammar;
 
 /**
  * A {@link Grammar} for C-style boolean expressions.

@@ -14,6 +14,8 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 /**
  * A CNF converter based on https://www.cs.jhu.edu/~jason/tutorials/convert-to-CNF.html
  * 
+ * Constants in the boolean {@link Formula} are converted to {@link #PSEUDO_TRUE} and {@link #PSEUDO_TRUE}.
+ * 
  * @author Adam Krafczyk
  */
 public class RecursiveCnfConverter implements ICnfConverter {

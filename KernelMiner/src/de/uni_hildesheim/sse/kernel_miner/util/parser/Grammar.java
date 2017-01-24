@@ -12,6 +12,8 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
  * two expressions they are applied to.
  * </p>
  * 
+ * @param <T> The type of formula that is constructed by this grammar.
+ * 
  * @see CStyleBooleanGrammar
  * 
  * @author Adam Krafczyk
@@ -19,10 +21,10 @@ import de.uni_hildesheim.sse.kernel_miner.util.logic.Variable;
 public abstract class Grammar<T> {
 
     /**
-     * Checks whether <code>i</code> points to a valid operator in the string <code>str</null>.
+     * Checks whether <code>i</code> points to a valid operator in the string <code>str</code>.
      * 
      * @param str The string where the operator may be present.
-     * @param i The pointer to the location in <code>str</null> where the operator may be.
+     * @param i The pointer to the location in <code>str</code> where the operator may be.
      * @return The operator or <code>null</code> if <code>i</code> is not pointing to a valid operator.
      */
     public abstract Operator getOperator(char[] str, int i);
@@ -72,6 +74,8 @@ public abstract class Grammar<T> {
      * @param operator The unary operator.
      * @param child The formula that is "inside" the operator (i.e. it's child in the AST).
      * @return A formula representing the operator applied to the child.
+     * 
+     * @throws ExpressionFormatException If constructing the formula is not possible.
      */
     public abstract T makeUnaryFormula(Operator operator, T child) throws ExpressionFormatException;
     
@@ -84,6 +88,8 @@ public abstract class Grammar<T> {
      * @param left The left side of the binary operation.
      * @param right The right side of the binary operation.
      * @return A formula representing the binary operation with the given left and right arguments.
+     * 
+     * @throws ExpressionFormatException If constructing the formula is not possible.
      */
     public abstract T makeBinaryFormula(Operator operator, T left, T right) throws ExpressionFormatException;
     
@@ -93,6 +99,8 @@ public abstract class Grammar<T> {
      * 
      * @param identifier The identifier to turn into a formula.
      * @return A formula representing the identifier.
+     * 
+     * @throws ExpressionFormatException If constructing the formula is not possible.
      */
     public abstract T makeIdentifierFormula(String identifier) throws ExpressionFormatException;
     

@@ -137,18 +137,18 @@ public class Logger {
      * The string will contain the stack trace, much like {@link Throwable#printStackTrace()}.
      * Additionally, the causing exceptions are converted into strings, too.
      * 
-     * @param e The exception to convert into a string.
+     * @param exc The exception to convert into a string.
      * @param lines The output target. The lines are appended to this list.
      */
-    private void exceptionToString(Throwable e, List<String> lines) {
-        lines.add(e.toString());
+    private void exceptionToString(Throwable exc, List<String> lines) {
+        lines.add(exc.toString());
         
-        StackTraceElement[] stack = e.getStackTrace();
+        StackTraceElement[] stack = exc.getStackTrace();
         for (int i = 0; i < stack.length; i++) {
             lines.add("    at " + stack[i].toString());
         }
         
-        Throwable cause = e.getCause();
+        Throwable cause = exc.getCause();
         if (cause != null) {
             lines.add("Caused by:");
             exceptionToString(cause, lines);
@@ -159,12 +159,12 @@ public class Logger {
      * Creates a log entry from the given comment and exception. The log level is "error".
      * 
      * @param comment A comment that is displayed above the exception. A ":" is appended to it by this method.
-     * @param e The exception to log. A stack trace will be logged.
+     * @param exc The exception to log. A stack trace will be logged.
      */
-    public void logException(String comment, Throwable e) {
-        List<String> lines = new ArrayList<>(e.getStackTrace().length + 2);
+    public void logException(String comment, Throwable exc) {
+        List<String> lines = new ArrayList<>(exc.getStackTrace().length + 2);
         lines.add(comment + ":");
-        exceptionToString(e, lines);
+        exceptionToString(exc, lines);
         log("error", lines.toArray(new String[0]));
     }
 
