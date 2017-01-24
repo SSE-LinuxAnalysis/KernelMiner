@@ -40,6 +40,16 @@ public class TypeChef {
      */
     private static final boolean CALL_IN_SAME_VM = false;
     
+    /**
+     * Whether the TypeChef parameters should be logged.
+     */
+    private static final boolean LOG_CALL_PARAMS = false;
+    
+    /**
+     * Whether the child JVM process should have same stdout and stderr as the parent one.
+     */
+    private static final boolean INHERIT_OUTPUT = false;
+    
     private File sourceDir;
     
     private File platformHeader;
@@ -463,7 +473,10 @@ public class TypeChef {
     private int runTypeChef(final SourceFile file, File piOutput, File pcFile) throws IOException, IllegalArgumentException {
         final List<String> params = buildParameters(file, piOutput, pcFile);
         
-        Logger.INSTANCE.logInfo(params.toArray(new String[0]));
+        
+        if (LOG_CALL_PARAMS) {
+            Logger.INSTANCE.logInfo(params.toArray(new String[0]));
+        }
         
         final ServerSocket serSock = new ServerSocket(0);
         final List<String> errors = new LinkedList<>();
@@ -514,8 +527,10 @@ public class TypeChef {
                     "-cp", System.getProperty("java.class.path"),
                     TypeChefRunner.class.getName(),
                     String.valueOf(serSock.getLocalPort()));
-            builder.redirectError(Redirect.INHERIT);
-            builder.redirectOutput(Redirect.INHERIT);
+            if (INHERIT_OUTPUT) {
+                builder.redirectError(Redirect.INHERIT);
+                builder.redirectOutput(Redirect.INHERIT);
+            }
             Process process = builder.start();
             
             try {
