@@ -463,6 +463,8 @@ public class TypeChef {
     private int runTypeChef(final SourceFile file, File piOutput, File pcFile) throws IOException, IllegalArgumentException {
         final List<String> params = buildParameters(file, piOutput, pcFile);
         
+        Logger.INSTANCE.logInfo(params.toArray(new String[0]));
+        
         final ServerSocket serSock = new ServerSocket(0);
         final List<String> errors = new LinkedList<>();
         
@@ -500,6 +502,7 @@ public class TypeChef {
         comm.start();
         
         if (CALL_IN_SAME_VM) {
+            Logger.INSTANCE.logWarning("Starting TypeChef in same JVM");
             try {
                 TypeChefRunner.main(new String[] {String.valueOf(serSock.getLocalPort())});
             } catch (Exception e) {
