@@ -15,6 +15,12 @@ import java.nio.charset.Charset;
  * @author Adam Krafczyk
  */
 public class Files {
+    
+    /**
+     * No instances allowed
+     */
+    private Files() {
+    }
 
     /**
      * Relativizes the path of a file, compared to another given file.
