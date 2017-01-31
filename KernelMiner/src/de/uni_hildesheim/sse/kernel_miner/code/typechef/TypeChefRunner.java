@@ -11,6 +11,7 @@ import java.util.List;
 import de.fosd.typechef.LexerToken;
 import de.fosd.typechef.VALexer;
 import de.fosd.typechef.conditional.Conditional;
+import de.fosd.typechef.conditional.One;
 import de.fosd.typechef.featureexpr.FeatureExpr;
 import de.fosd.typechef.featureexpr.FeatureModel;
 import de.fosd.typechef.lexer.LexerException;
@@ -18,9 +19,14 @@ import de.fosd.typechef.lexer.LexerFrontend;
 import de.fosd.typechef.lexer.LexerFrontend.LexerError;
 import de.fosd.typechef.lexer.LexerFrontend.LexerResult;
 import de.fosd.typechef.lexer.LexerFrontend.LexerSuccess;
-import de.fosd.typechef.lexer.options.ILexerOptions;
 import de.fosd.typechef.options.FrontendOptionsWithConfigFiles;
 import de.fosd.typechef.options.OptionException;
+import de.fosd.typechef.parser.TokenReader;
+import de.fosd.typechef.parser.c.CLexerAdapter;
+import de.fosd.typechef.parser.c.CParser;
+import de.fosd.typechef.parser.c.CTypeContext;
+import de.fosd.typechef.parser.c.ParserMain;
+import de.fosd.typechef.parser.c.TranslationUnit;
 import de.uni_hildesheim.sse.kernel_miner.code.CToken;
 import de.uni_hildesheim.sse.kernel_miner.util.parser.ExpressionFormatException;
 import scala.Tuple2;
@@ -32,6 +38,8 @@ public class TypeChefRunner {
     private ObjectOutputStream out;
     
     private ObjectInputStream in;
+    
+    private FrontendOptionsWithConfigFiles config;
     
     private List<LexerToken> lexerTokens;
     
@@ -49,8 +57,11 @@ public class TypeChefRunner {
     
     public void run() throws Exception {
         try {
-             ILexerOptions conf = readParameters();
-             runTypeChef(conf);
+             readParameters();
+             runTypeChef();
+             if (lexerTokens != null) {
+                 parseAst();
+             }
              convertResult();
              sendResult();
         } finally {
@@ -60,28 +71,26 @@ public class TypeChefRunner {
     }
     
     @SuppressWarnings("unchecked")
-    private ILexerOptions readParameters() throws ClassNotFoundException, IOException, OptionException {
+    private void readParameters() throws ClassNotFoundException, IOException, OptionException {
         
         List<String> params = (List<String>) in.readObject();
-        FrontendOptionsWithConfigFiles conf = new FrontendOptionsWithConfigFiles() {
+        config = new FrontendOptionsWithConfigFiles() {
             @Override
             public boolean isPrintLexingSuccess() {
                 return false;
             }
         };
-        conf.parseOptions(params.toArray(new String[0]));
-        
-        return conf;
+        config.parseOptions(params.toArray(new String[0]));
     }
     
-    private void runTypeChef(final ILexerOptions conf) throws LexerException, IOException {
+    private void runTypeChef() throws LexerException, IOException {
         LexerFrontend lexer = new LexerFrontend();
         Conditional<LexerResult> result = lexer.run(new VALexer.LexerFactory() {
             @Override
             public VALexer create(FeatureModel model) {
-                return new XtcPreprocessor(conf.getMacroFilter(), model);
+                return new XtcPreprocessor(config.getMacroFilter(), model);
             }
-        }, conf, true);
+        }, config, true);
         
         scala.collection.immutable.List<Tuple2<FeatureExpr, LexerResult>> list = result.toList();
         
@@ -99,6 +108,25 @@ public class TypeChefRunner {
             } else {
                 System.err.println("Unexpected lexer output object: " + t._2);
             }
+        }
+    }
+    
+    private void parseAst() {
+        System.out.println("parseAst()");
+        
+        ParserMain parser = new ParserMain(new CParser(null, false));
+        
+        LexerSuccess wrapper = new LexerSuccess(lexerTokens);
+        TokenReader<de.fosd.typechef.parser.c.CToken, CTypeContext> tokenReader
+                = CLexerAdapter.prepareTokens(new One<LexerResult>(wrapper));
+        
+        TranslationUnit unit = parser.parserMain(tokenReader, config, null);
+        
+        AstConverter converter = new AstConverter(unit);
+        
+        System.out.println(converter.convertToFile());
+        for (ConverterException e : converter.getExceptions()) {
+            System.out.println(e.toString());
         }
     }
     

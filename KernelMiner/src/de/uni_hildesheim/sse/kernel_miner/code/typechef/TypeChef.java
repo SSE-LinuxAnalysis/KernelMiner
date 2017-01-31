@@ -38,7 +38,7 @@ public class TypeChef {
      * Whether to launch a separate JVM or not. Set to <code>true</code> only
      * for debug purposes.
      */
-    private static final boolean CALL_IN_SAME_VM = false;
+    private static final boolean CALL_IN_SAME_VM = true;
     
     /**
      * Whether the TypeChef parameters should be logged.
@@ -48,7 +48,7 @@ public class TypeChef {
     /**
      * Whether the child JVM process should have same stdout and stderr as the parent one.
      */
-    private static final boolean INHERIT_OUTPUT = false;
+    private static final boolean INHERIT_OUTPUT = true;
     
     private File sourceDir;
     
